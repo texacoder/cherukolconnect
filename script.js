@@ -51,75 +51,10 @@ const SHEET_REFRESH_MS = 5 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /* =========================================================
-   SEED DATA — fallback only.
-   Used if the Google Sheet hasn't been configured yet, or a
-   fetch fails (e.g. offline, sheet not published). Keeps the
-   site looking populated instead of empty/broken during setup
-   or a temporary network hiccup.
+   GALLERY — static images shown in the Gallery tab and the
+   home page carousel. Not sourced from the Sheet; edit this
+   array directly to change the photos on display.
    ========================================================= */
-function daysAgoISO(n){
-  return new Date(Date.now() - n * DAY_MS).toISOString();
-}
-
-const SEED_NEWS = [
-  {
-    id: "n1",
-    title: "Panchayath launches new drinking water scheme for Ward 4",
-    summary: "A fresh pipeline project aims to bring round-the-clock water supply to over 300 households by next month.",
-    image: "images/news-water.jpg",
-    date: daysAgoISO(0)
-  },
-  {
-    id: "n2",
-    title: "Public health camp scheduled at Community Hall this weekend",
-    summary: "Free general checkups, eye screening, and vaccination drives will be held from 9 AM to 4 PM.",
-    image: "images/news-healthcamp.jpg",
-    date: daysAgoISO(0)
-  },
-  {
-    id: "n3",
-    title: "New LED streetlights installed along the river road",
-    summary: "Over 40 energy-efficient LED lights have replaced old sodium lamps, improving night-time visibility for commuters.",
-    image: "images/news-streetlight.jpg",
-    date: daysAgoISO(0)
-  },
-  {
-    id: "n4",
-    title: "Road resurfacing work completed on Main Bazaar Road",
-    summary: "The stretch connecting the bus stand to the market has been repaved, easing daily commutes for residents.",
-    image: "images/news-road.jpg",
-    date: daysAgoISO(1)
-  },
-  {
-    id: "n5",
-    title: "Monsoon preparedness meeting held with ward members",
-    summary: "Officials reviewed drainage clearance and flood-response plans ahead of the coming rains.",
-    image: "images/news-meeting.jpg",
-    date: daysAgoISO(1)
-  },
-  {
-    id: "n6",
-    title: "Library extends evening hours for students during exam season",
-    summary: "The Panchayath public library will now stay open until 8 PM on weekdays through the exam period.",
-    image: "images/news-library.jpg",
-    date: daysAgoISO(1)
-  },
-  {
-    id: "n7",
-    title: "Kudumbashree unit opens new handicrafts stall near the market",
-    summary: "Local women's collective showcases handmade bags, coir products, and festival decor at a new permanent stall.",
-    image: "images/news-handicrafts.jpg",
-    date: daysAgoISO(2)
-  },
-  {
-    id: "n8",
-    title: "Grama Sabha meeting notice for next month's ward development plan",
-    summary: "Residents are invited to share priorities for the upcoming annual development plan at the ward-level meeting.",
-    image: "images/news-meeting2.jpg",
-    date: daysAgoISO(4)
-  }
-];
-
 const GALLERY_IMAGES = [
   { src: "images/gallery-office.jpg",  caption: "Panchayath Office" },
   { src: "images/gallery-hall.jpg",    caption: "Community Hall" },
@@ -129,95 +64,6 @@ const GALLERY_IMAGES = [
   { src: "images/gallery-school.jpg",  caption: "Government School" }
 ];
 
-/* ---------------------------------------------------------
-   Malayalam translations for seed content, keyed by id.
-   These are looked up at render time (see localize()) so
-   switching languages also translates the text INSIDE the
-   news / updates / achievements / gallery cards, not just
-   the surrounding UI labels.
-
-   NOTE: this static map only covers the fallback SEED data.
-   Real content from the Google Sheet supplies its own English
-   and Malayalam text directly as sheet columns (see below) —
-   no translation API, no guessing.
-   --------------------------------------------------------- */
-const SEED_NEWS_ML = {
-  n1: {
-    title: "വാർഡ് 4-ന് പുതിയ കുടിവെള്ള പദ്ധതി പഞ്ചായത്ത് ആരംഭിച്ചു",
-    summary: "അടുത്ത മാസത്തോടെ 300-ലധികം വീടുകളിൽ 24 മണിക്കൂറും കുടിവെള്ളം എത്തിക്കാൻ ലക്ഷ്യമിടുന്ന പുതിയ പൈപ്പ്‌ലൈൻ പദ്ധതി."
-  },
-  n2: {
-    title: "ഈ വാരാന്ത്യം കമ്മ്യൂണിറ്റി ഹാളിൽ പൊതുജനാരോഗ്യ ക്യാമ്പ്",
-    summary: "രാവിലെ 9 മുതൽ വൈകിട്ട് 4 വരെ സൗജന്യ പൊതു പരിശോധന, കണ്ണ് പരിശോധന, വാക്സിനേഷൻ ക്യാമ്പുകൾ നടക്കും."
-  },
-  n3: {
-    title: "നദീതീര റോഡിൽ പുതിയ എൽഇഡി തെരുവുവിളക്കുകൾ സ്ഥാപിച്ചു",
-    summary: "40-ലധികം ഊർജക്ഷമതയുള്ള എൽഇഡി ലൈറ്റുകൾ പഴയ സോഡിയം ലാമ്പുകൾക്ക് പകരം സ്ഥാപിച്ചു, രാത്രി യാത്രക്കാർക്ക് കൂടുതൽ ദൃശ്യപരത നൽകുന്നു."
-  },
-  n4: {
-    title: "മെയിൻ ബസാർ റോഡിലെ റോഡ് പുനർനിർമാണം പൂർത്തിയായി",
-    summary: "ബസ് സ്റ്റാൻഡിനെ മാർക്കറ്റുമായി ബന്ധിപ്പിക്കുന്ന ഭാഗം പുനർനിർമിച്ചു, നിവാസികളുടെ ദൈനംദിന യാത്ര എളുപ്പമാക്കുന്നു."
-  },
-  n5: {
-    title: "വാർഡ് അംഗങ്ങളുമായി മൺസൂൺ തയ്യാറെടുപ്പ് യോഗം നടന്നു",
-    summary: "വരാനിരിക്കുന്ന മഴയ്ക്ക് മുന്നോടിയായി ഡ്രെയിനേജ് ക്ലിയറൻസും വെള്ളപ്പൊക്ക പ്രതിരോധ പദ്ധതികളും ഉദ്യോഗസ്ഥർ അവലോകനം ചെയ്തു."
-  },
-  n6: {
-    title: "പരീക്ഷാക്കാലത്ത് വിദ്യാർത്ഥികൾക്കായി ലൈബ്രറി വൈകുന്നേര സമയം നീട്ടി",
-    summary: "പരീക്ഷാക്കാലയളവിൽ പഞ്ചായത്ത് പൊതു ലൈബ്രറി പ്രവൃത്തിദിവസങ്ങളിൽ രാത്രി 8 മണി വരെ തുറന്നിരിക്കും."
-  },
-  n7: {
-    title: "മാർക്കറ്റിനടുത്ത് കുടുംബശ്രീ യൂണിറ്റ് പുതിയ കരകൗശല സ്റ്റാൾ തുറന്നു",
-    summary: "പ്രാദേശിക വനിതാ കൂട്ടായ്മ കൈകൊണ്ട് നിർമ്മിച്ച ബാഗുകൾ, കയർ ഉൽപ്പന്നങ്ങൾ, ഉത്സവ അലങ്കാരങ്ങൾ എന്നിവ പുതിയ സ്ഥിരം സ്റ്റാളിൽ പ്രദർശിപ്പിക്കുന്നു."
-  },
-  n8: {
-    title: "അടുത്ത മാസത്തെ വാർഡ് വികസന പദ്ധതിക്കുള്ള ഗ്രാമസഭാ യോഗ അറിയിപ്പ്",
-    summary: "വരാനിരിക്കുന്ന വാർഷിക വികസന പദ്ധതിക്കായി മുൻഗണനകൾ പങ്കിടാൻ നിവാസികളെ വാർഡ്തല യോഗത്തിലേക്ക് ക്ഷണിക്കുന്നു."
-  }
-};
-
-const SEED_UPDATES_ML = {
-  u1: {
-    tag: "അവസാന തീയതി",
-    title: "സ്വത്ത് നികുതി അടയ്ക്കാനുള്ള അവസാന തീയതി ഓഗസ്റ്റ് 31 വരെ നീട്ടി",
-    detail: "നീട്ടിയ അവസാന തീയതിക്കുള്ളിൽ വൈകിയ ഫീസില്ലാതെ നിവാസികൾക്ക് ഇപ്പോൾ സ്വത്ത് നികുതി അടയ്ക്കാം. ഓൺലൈനിലോ പഞ്ചായത്ത് ഓഫീസ് കൗണ്ടറിലോ പണമടയ്ക്കാം."
-  },
-  u2: {
-    tag: "ഓഫീസ് അറിയിപ്പ്",
-    title: "ഓണം അവധി പ്രമാണിച്ച് പഞ്ചായത്ത് ഓഫീസ് അടച്ചിരിക്കും",
-    detail: "ഓണത്തോടനുബന്ധിച്ച് ഈ മാസം 5 മുതൽ 7 വരെ ഓഫീസ് അടച്ചിരിക്കും. അടിയന്തര സേവനങ്ങൾക്ക് WhatsApp പരാതി ലൈൻ വഴി ബന്ധപ്പെടാം."
-  },
-  u3: {
-    tag: "പുതിയ സേവനം",
-    title: "ജനന, മരണ സർട്ടിഫിക്കറ്റുകൾ ഇപ്പോൾ ഓൺലൈനിൽ ലഭ്യമാണ്",
-    detail: "ജനന, മരണ സർട്ടിഫിക്കറ്റുകൾക്കുള്ള അപേക്ഷകൾ ഇപ്പോൾ ഇ-ഡിസ്ട്രിക്റ്റ് കേരള പോർട്ടൽ വഴി സമർപ്പിക്കാം, ഓഫീസ് സന്ദർശനത്തിന്റെ ആവശ്യം കുറയ്ക്കുന്നു."
-  },
-  u4: {
-    tag: "അറിയിപ്പ്",
-    title: "വ്യാഴാഴ്ച താൽക്കാലിക കുടിവെള്ള വിതരണ തടസ്സം",
-    detail: "വാർഡ് 3, 5 എന്നിവിടങ്ങളിൽ പതിവ് പൈപ്പ്‌ലൈൻ അറ്റകുറ്റപ്പണിക്കായി വ്യാഴാഴ്ച രാവിലെ 10 മുതൽ ഉച്ചയ്ക്ക് 2 വരെ കുടിവെള്ള വിതരണം തടസ്സപ്പെടും."
-  }
-};
-
-const SEED_ACHIEVEMENTS_ML = {
-  a1: {
-    title: "മികച്ച പഞ്ചായത്ത് അവാർഡ് — ശുചിത്വവും മാലിന്യ സംസ്കരണവും",
-    detail: "വീടുതോറുമുള്ള മാലിന്യ ശേഖരണവും പ്രവർത്തനക്ഷമമായ വസ്തു ശേഖരണ കേന്ദ്രവും വിജയകരമായി നടപ്പാക്കിയതിന് ജില്ലാതലത്തിൽ അംഗീകാരം."
-  },
-  a2: {
-    title: "100% എൽഇഡി തെരുവുവിളക്ക് പരിവർത്തനം പൂർത്തിയായി",
-    detail: "എല്ലാ വാർഡ് റോഡുകളും ഇപ്പോൾ ഊർജക്ഷമതയുള്ള എൽഇഡി ലൈറ്റിംഗിലാണ്, ഇത് പഞ്ചായത്തിന്റെ വൈദ്യുതി ചെലവ് കുറയ്ക്കുകയും രാത്രി സുരക്ഷ മെച്ചപ്പെടുത്തുകയും ചെയ്യുന്നു."
-  },
-  a3: {
-    title: "വാർഡ് വോളന്റിയർമാർക്ക് പൂർണ്ണ ഡിജിറ്റൽ സാക്ഷരതാ പരിരക്ഷ",
-    detail: "ഓരോ വാർഡിലും ഇപ്പോൾ പരിശീലനം ലഭിച്ച കുടുംബശ്രീ വോളന്റിയർമാർ ഉണ്ട്, ഇ-ഡിസ്ട്രിക്റ്റ്, കെ-സ്മാർട്ട് ഓൺലൈൻ സേവനങ്ങളിൽ നിവാസികളെ സഹായിക്കാൻ കഴിയും."
-  },
-  a4: {
-    title: "കുടിവെള്ള വിതരണ പദ്ധതിക്കുള്ള ശുദ്ധജല അവാർഡ്",
-    detail: "പഞ്ചായത്തിലെ 80%-ലധികം വീടുകളിലേക്ക് സുരക്ഷിതമായ പൈപ്പ് കുടിവെള്ളം എത്തിച്ചതിന് സംസ്ഥാനതല അംഗീകാരം."
-  }
-};
-
 const GALLERY_CAPTIONS_ML = {
   "images/gallery-office.jpg": "പഞ്ചായത്ത് ഓഫീസ്",
   "images/gallery-hall.jpg": "കമ്മ്യൂണിറ്റി ഹാൾ",
@@ -226,68 +72,6 @@ const GALLERY_CAPTIONS_ML = {
   "images/gallery-temple.jpg": "ക്ഷേത്ര മൈതാനം",
   "images/gallery-school.jpg": "സർക്കാർ സ്കൂൾ"
 };
-
-const SEED_UPDATES = [
-  {
-    id: "u1",
-    tag: "Deadline",
-    title: "Property tax payment deadline extended to 31st August",
-    detail: "Residents can now pay property tax without a late fee through the extended deadline. Payments can be made online or at the Panchayath office counter.",
-    date: daysAgoISO(0),
-    priority: "urgent"
-  },
-  {
-    id: "u2",
-    tag: "Office Notice",
-    title: "Panchayath office closed on account of Onam holidays",
-    detail: "The office will remain closed from the 5th to the 7th of the month for Onam. Emergency services can be reached via the WhatsApp complaint line.",
-    date: daysAgoISO(1),
-    priority: "notice"
-  },
-  {
-    id: "u3",
-    tag: "New Service",
-    title: "Birth and death certificates now available online",
-    detail: "Applications for birth and death certificates can now be submitted through the e-District Kerala portal, reducing the need for an office visit.",
-    date: daysAgoISO(2),
-    priority: "notice"
-  },
-  {
-    id: "u4",
-    tag: "Advisory",
-    title: "Temporary water supply interruption on Thursday",
-    detail: "Water supply will be interrupted between 10 AM and 2 PM on Thursday for routine pipeline maintenance in Wards 3 and 5.",
-    date: daysAgoISO(3),
-    priority: "urgent"
-  }
-];
-
-const SEED_ACHIEVEMENTS = [
-  {
-    id: "a1",
-    year: "2025",
-    title: "Best Panchayath Award — Sanitation & Waste Management",
-    detail: "Recognised at the district level for the successful rollout of door-to-door waste collection and a working material collection facility."
-  },
-  {
-    id: "a2",
-    year: "2024",
-    title: "100% LED streetlight conversion completed",
-    detail: "All ward roads now run on energy-efficient LED lighting, cutting the Panchayath's power costs and improving night-time safety."
-  },
-  {
-    id: "a3",
-    year: "2024",
-    title: "Full digital literacy coverage for Ward volunteers",
-    detail: "Every ward now has trained Kudumbashree volunteers able to assist residents with e-District and KSMART online services."
-  },
-  {
-    id: "a4",
-    year: "2023",
-    title: "Clean Water Award for the drinking water supply project",
-    detail: "State-level recognition for expanding safe piped drinking water access to over 80% of Panchayath households."
-  }
-];
 
 /* =========================================================
    i18n — English / Malayalam
@@ -459,7 +243,7 @@ function applyTranslations(){
   // Re-render dynamic sections so in-card strings (Latest/Archive
   // pill, "Today"/"N days ago", date formatting) follow the
   // selected language too. Uses whatever is currently cached in
-  // memory (already-fetched Sheet data or seed data) — no re-fetch.
+  // memory (already-fetched Sheet data) — no re-fetch.
   renderAllNews();
   renderUpdates();
   renderAchievements();
@@ -536,9 +320,9 @@ function parseCSV(text){
 /* ---------------------------------------------------------
    Fetches and parses a published Google Sheet CSV. Returns
    null (not a throw) on any failure, so callers can cleanly
-   fall back to seed data — a client who hasn't finished the
-   Sheet setup yet, or a temporary network drop, never breaks
-   the page.
+   fall back to an empty list — a client who hasn't finished
+   the Sheet setup yet, or a temporary network drop, never
+   breaks the page.
    --------------------------------------------------------- */
 async function fetchSheet(url){
   if (!url || url.includes("PASTE_YOUR_PUBLISHED_ID_HERE")) return null;
@@ -548,7 +332,7 @@ async function fetchSheet(url){
     const text = await res.text();
     return parseCSV(text);
   }catch(e){
-    console.warn("Could not load Google Sheet, using fallback content.", url, e);
+    console.warn("Could not load Google Sheet, using empty fallback content.", url, e);
     return null;
   }
 }
@@ -610,12 +394,13 @@ function rowToAchievementItem(row, i){
   };
 }
 
-// In-memory caches. Populated from the Sheet on load (and every
-// SHEET_REFRESH_MS after); fall back to seed arrays until then
-// or if the Sheet is unreachable/unconfigured.
-let newsCache = [...SEED_NEWS];
-let updatesCache = [...SEED_UPDATES];
-let achievementsCache = [...SEED_ACHIEVEMENTS];
+// In-memory caches. Populated entirely from the Google Sheet on
+// load (and every SHEET_REFRESH_MS after). They start empty and
+// stay empty until the Sheet is configured and reachable — the
+// page's empty-state messages handle that gracefully.
+let newsCache = [];
+let updatesCache = [];
+let achievementsCache = [];
 
 async function loadNewsFromSheet(){
   const rows = await fetchSheet(SHEET_CSV.news);
@@ -643,18 +428,15 @@ async function refreshAllFromSheet(){
 
 /* ---------------------------------------------------------
    localize(): picks Malayalam text for an item when Malayalam
-   is active. Priority: a static SEED_*_ML entry (for fallback
-   seed content) wins if present; otherwise uses the item's own
-   _ml fields (populated directly from the Sheet's *_ml columns).
-   Falls back to the English/original text if no translation is
-   available for that field, so a client who only fills in
-   English never sees a blank card.
+   is active, using the item's own _ml fields (populated
+   directly from the Sheet's *_ml columns). Falls back to the
+   English/original text if no translation is available for
+   that field, so a client who only fills in English never
+   sees a blank card.
    --------------------------------------------------------- */
-function localize(item, translationMap){
+function localize(item){
   const lang = getCurrentLang();
   if (lang !== "ml") return item;
-  const seedTr = translationMap[item.id];
-  if (seedTr) return Object.assign({}, item, seedTr);
   if (item._ml){
     const filled = {};
     Object.entries(item._ml).forEach(([k, v]) => { if (v) filled[k] = v; });
@@ -750,11 +532,11 @@ function renderAllNews(){
   const latestGrid = document.getElementById("latestNewsGrid");
   const toShow = latest.slice(0, LATEST_DISPLAY_COUNT);
 
-  latestGrid.innerHTML = toShow.map(i => newsCardHTML(localize(i, SEED_NEWS_ML), true)).join("");
+  latestGrid.innerHTML = toShow.map(i => newsCardHTML(localize(i), true)).join("");
   document.getElementById("latestEmptyState").hidden = toShow.length > 0;
 
   const oldGrid = document.getElementById("oldNewsGrid");
-  oldGrid.innerHTML = old.map(i => newsListItemHTML(localize(i, SEED_NEWS_ML))).join("");
+  oldGrid.innerHTML = old.map(i => newsListItemHTML(localize(i))).join("");
   document.getElementById("oldEmptyState").hidden = old.length > 0;
 }
 
@@ -897,7 +679,7 @@ function updateItemHTML(item){
 function renderUpdates(){
   const items = updatesCache.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
   const grid = document.getElementById("updatesGrid");
-  grid.innerHTML = items.map(i => updateItemHTML(localize(i, SEED_UPDATES_ML))).join("");
+  grid.innerHTML = items.map(i => updateItemHTML(localize(i))).join("");
   document.getElementById("updatesEmptyState").hidden = items.length > 0;
 }
 
@@ -927,7 +709,7 @@ function achievementCardHTML(item){
 
 function renderAchievements(){
   const grid = document.getElementById("achievementsGrid");
-  grid.innerHTML = achievementsCache.map(i => achievementCardHTML(localize(i, SEED_ACHIEVEMENTS_ML))).join("");
+  grid.innerHTML = achievementsCache.map(i => achievementCardHTML(localize(i))).join("");
   document.getElementById("achievementsEmptyState").hidden = achievementsCache.length > 0;
 }
 
@@ -1024,9 +806,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   initNav();
 
-  // Render immediately with seed/cached data so the page never
-  // looks empty while the Sheet fetch is in flight, then swap in
-  // real content the moment it arrives.
+  // Render immediately (empty state until the Sheet loads) so the
+  // page structure is ready, then swap in real content the moment
+  // the Sheet fetch resolves.
   renderAllNews();
   renderUpdates();
   renderAchievements();
@@ -1040,12 +822,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("resize", updateBreakpointAttr);
 
   // Pull real content from the Google Sheet (falls back silently
-  // to seed data if not configured yet or unreachable).
+  // to an empty list if not configured yet or unreachable).
   await refreshAllFromSheet();
 
   // Keep content fresh for anyone who leaves a tab open, and
   // re-check the two-day/one-week aging windows periodically.
   setInterval(refreshAllFromSheet, SHEET_REFRESH_MS);
 });
-
-
