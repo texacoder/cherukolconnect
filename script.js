@@ -1047,3 +1047,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   // re-check the two-day/one-week aging windows periodically.
   setInterval(refreshAllFromSheet, SHEET_REFRESH_MS);
 });
+
+
