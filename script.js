@@ -17,13 +17,45 @@ const ARCHIVE_LIFETIME_DAYS = 7;
 // "Latest from your Panchayath" grid on the home page.
 const LATEST_DISPLAY_COUNT = 7;
 
-const STORAGE_KEY = "cherukolConnectNewsItems";
+/* =========================================================
+   CONTENT SOURCE — Google Sheets
+   =========================================================
+   The client edits three tabs in one Google Sheet (News,
+   Updates, Achievements). Each tab is published to the web as
+   CSV and fetched here on every page load, so every visitor
+   sees the same content — no login, no admin panel, no code.
+
+   SETUP (do this once):
+   1. Create a Google Sheet with three tabs named exactly:
+      News | Updates | Achievements
+      (see README-FOR-CLIENT.md for the exact column headers
+      each tab needs, and a template link.)
+   2. File -> Share -> Publish to web -> choose each individual
+      sheet/tab (not "Entire document") -> CSV -> Publish.
+   3. Copy the CSV link Google gives you for each tab and paste
+      it below, replacing the placeholder URLs.
+   4. That's it. The client only ever touches the Sheet again.
+   ========================================================= */
+const SHEET_CSV = {
+  news:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=0&single=true&output=csv",
+  updates:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2101454905&single=true&output=csv",
+  achievements: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=735728458&single=true&output=csv"
+};
+
+// How often (in ms) to re-fetch the Sheet while the site is open,
+// so a change the client makes shows up for visitors already
+// browsing without them needing to refresh. 5 minutes is a
+// reasonable balance between freshness and not hammering Google.
+const SHEET_REFRESH_MS = 5 * 60 * 1000;
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /* =========================================================
-   SEED DATA — used only the first time the site runs, so
-   there's something to see. Replace freely, or add stories
-   through addNewsItem() (see bottom of file).
+   SEED DATA — fallback only.
+   Used if the Google Sheet hasn't been configured yet, or a
+   fetch fails (e.g. offline, sheet not published). Keeps the
+   site looking populated instead of empty/broken during setup
+   or a temporary network hiccup.
    ========================================================= */
 function daysAgoISO(n){
   return new Date(Date.now() - n * DAY_MS).toISOString();
@@ -102,9 +134,12 @@ const GALLERY_IMAGES = [
    These are looked up at render time (see localize()) so
    switching languages also translates the text INSIDE the
    news / updates / achievements / gallery cards, not just
-   the surrounding UI labels. If a new item is added later via
-   addNewsItem()/addUpdateItem()/addAchievement() with no entry
-   here, it simply falls back to the text it was created with.
+   the surrounding UI labels.
+
+   NOTE: this static map only covers the fallback SEED data.
+   Real content from the Google Sheet supplies its own English
+   and Malayalam text directly as sheet columns (see below) —
+   no translation API, no guessing.
    --------------------------------------------------------- */
 const SEED_NEWS_ML = {
   n1: {
@@ -192,81 +227,6 @@ const GALLERY_CAPTIONS_ML = {
   "images/gallery-school.jpg": "സർക്കാർ സ്കൂൾ"
 };
 
-// Returns a copy of a seed item with English fields swapped for
-// their Malayalam counterparts (when available) based on the
-// current language. Priority: a static SEED_*_ML entry (curated,
-// keyed by id) wins if present; otherwise falls back to any
-// auto-translated fields cached directly on the item itself
-// (added via translateAndCache() when the item was created).
-function localize(item, translationMap){
-  const lang = getCurrentLang();
-  if (lang !== "ml") return item;
-  const seedTr = translationMap[item.id];
-  if (seedTr) return Object.assign({}, item, seedTr);
-  if (item._ml) return Object.assign({}, item, item._ml);
-  return item;
-}
-
-/* ---------------------------------------------------------
-   AUTO-TRANSLATE for newly added content
-   New items created through addNewsItem()/addUpdateItem()/
-   addAchievement() have no entry in the static SEED_*_ML maps,
-   so their Malayalam text is fetched once (via the free
-   MyMemory translation API) at creation time and cached on the
-   item as `_ml` in localStorage. Later renders just reuse that
-   cached translation — no repeat API calls, and it still works
-   offline after the first fetch. If the request fails (e.g. no
-   network), the item silently falls back to showing its
-   original language text, same as before this feature existed.
-   --------------------------------------------------------- */
-async function translateText(text){
-  if (!text) return "";
-  try{
-    const res = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ml`
-    );
-    if (!res.ok) throw new Error("Translation request failed");
-    const data = await res.json();
-    const translated = data && data.responseData && data.responseData.translatedText;
-    return translated || "";
-  }catch(e){
-    console.warn("Auto-translation unavailable, showing original text instead.", e);
-    return "";
-  }
-}
-
-// Translates the given fields of an item to Malayalam, caches
-// them under item._ml in the given store (by id), and re-renders
-// via the provided callback once done.
-async function translateAndCache(id, fields, storageKey, rerender){
-  const translatedEntries = await Promise.all(
-    Object.entries(fields).map(async ([key, value]) => [key, await translateText(value)])
-  );
-  const ml = {};
-  translatedEntries.forEach(([key, value]) => { if (value) ml[key] = value; });
-  if (Object.keys(ml).length === 0) return;
-
-  try{
-    const raw = localStorage.getItem(storageKey);
-    if (!raw) return;
-    const items = JSON.parse(raw);
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    item._ml = ml;
-    localStorage.setItem(storageKey, JSON.stringify(items));
-  }catch(e){
-    console.warn("Could not cache auto-translation.", e);
-    return;
-  }
-
-  rerender();
-}
-
-/* ---------------------------------------------------------
-   Important Updates — placeholder content. Replace freely,
-   or add more through addUpdateItem() (see bottom of file).
-   priority: "urgent" | "notice"
-   --------------------------------------------------------- */
 const SEED_UPDATES = [
   {
     id: "u1",
@@ -302,10 +262,6 @@ const SEED_UPDATES = [
   }
 ];
 
-/* ---------------------------------------------------------
-   Achievements — placeholder content. Replace freely, or add
-   more through addAchievement() (see bottom of file).
-   --------------------------------------------------------- */
 const SEED_ACHIEVEMENTS = [
   {
     id: "a1",
@@ -488,10 +444,6 @@ function t(key){
   return (I18N[lang] && I18N[lang][key]) || (I18N.en && I18N.en[key]) || key;
 }
 
-// Applies translations to every element tagged with data-i18n /
-// data-i18n-placeholder, and re-renders any dynamically built
-// content (news cards, updates, achievements) so their generated
-// text (e.g. "Today", "3 days ago") switches too.
 function applyTranslations(){
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.getAttribute("data-i18n");
@@ -506,7 +458,8 @@ function applyTranslations(){
 
   // Re-render dynamic sections so in-card strings (Latest/Archive
   // pill, "Today"/"N days ago", date formatting) follow the
-  // selected language too.
+  // selected language too. Uses whatever is currently cached in
+  // memory (already-fetched Sheet data or seed data) — no re-fetch.
   renderAllNews();
   renderUpdates();
   renderAchievements();
@@ -534,31 +487,185 @@ function initLangToggle(){
 }
 
 /* =========================================================
-   NEWS STORAGE + LIFECYCLE
+   CSV PARSING (small, dependency-free)
+   =========================================================
+   Handles quoted fields, commas inside quotes, and escaped
+   quotes ("") — enough for what Google Sheets' CSV export
+   produces. Returns an array of row-objects keyed by the
+   header row.
    ========================================================= */
-function loadNews(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      saveNews(SEED_NEWS);
-      return [...SEED_NEWS];
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQuotes){
+      if (c === '"'){
+        if (text[i + 1] === '"'){ field += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"'){ inQuotes = true; }
+      else if (c === ','){ row.push(field); field = ""; }
+      else if (c === '\n' || c === '\r'){
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); field = "";
+        if (row.length > 1 || row[0] !== "") rows.push(row);
+        row = [];
+      } else {
+        field += c;
+      }
     }
-    return JSON.parse(raw);
-  }catch(e){
-    console.warn("Could not read stored news, using seed data.", e);
-    return [...SEED_NEWS];
   }
+  if (field !== "" || row.length){ row.push(field); rows.push(row); }
+  if (!rows.length) return [];
+
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1)
+    .filter(r => r.some(cell => cell.trim() !== ""))
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, idx) => { obj[h] = (r[idx] || "").trim(); });
+      return obj;
+    });
 }
 
-function saveNews(items){
+/* ---------------------------------------------------------
+   Fetches and parses a published Google Sheet CSV. Returns
+   null (not a throw) on any failure, so callers can cleanly
+   fall back to seed data — a client who hasn't finished the
+   Sheet setup yet, or a temporary network drop, never breaks
+   the page.
+   --------------------------------------------------------- */
+async function fetchSheet(url){
+  if (!url || url.includes("PASTE_YOUR_PUBLISHED_ID_HERE")) return null;
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("Sheet fetch failed: " + res.status);
+    const text = await res.text();
+    return parseCSV(text);
   }catch(e){
-    console.warn("Could not save news to this browser.", e);
+    console.warn("Could not load Google Sheet, using fallback content.", url, e);
+    return null;
   }
 }
 
-// Removes anything older than ARCHIVE_LIFETIME_DAYS and returns what's left.
+/* ---------------------------------------------------------
+   Row -> item mappers.
+   Each expects specific column headers in the Sheet (see
+   README-FOR-CLIENT.md). Blank optional cells fall back to
+   sensible defaults so a client leaving a column empty never
+   breaks rendering.
+   --------------------------------------------------------- */
+function parseSheetDate(value){
+  if (!value) return new Date().toISOString();
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+}
+
+function rowToNewsItem(row, i){
+  return {
+    id: row.id || ("sheet-n" + i),
+    title: row.title_en || row.title || "",
+    summary: row.summary_en || row.summary || "",
+    image: row.image || "images/news-placeholder.jpg",
+    date: parseSheetDate(row.date),
+    _ml: {
+      title: row.title_ml || "",
+      summary: row.summary_ml || ""
+    }
+  };
+}
+
+function rowToUpdateItem(row, i){
+  const priorityRaw = (row.priority || "").trim().toLowerCase();
+  return {
+    id: row.id || ("sheet-u" + i),
+    tag: row.tag_en || row.tag || "Notice",
+    title: row.title_en || row.title || "",
+    detail: row.detail_en || row.detail || "",
+    date: parseSheetDate(row.date),
+    priority: priorityRaw === "urgent" ? "urgent" : "notice",
+    _ml: {
+      tag: row.tag_ml || "",
+      title: row.title_ml || "",
+      detail: row.detail_ml || ""
+    }
+  };
+}
+
+function rowToAchievementItem(row, i){
+  return {
+    id: row.id || ("sheet-a" + i),
+    year: row.year || String(new Date().getFullYear()),
+    title: row.title_en || row.title || "",
+    detail: row.detail_en || row.detail || "",
+    _ml: {
+      title: row.title_ml || "",
+      detail: row.detail_ml || ""
+    }
+  };
+}
+
+// In-memory caches. Populated from the Sheet on load (and every
+// SHEET_REFRESH_MS after); fall back to seed arrays until then
+// or if the Sheet is unreachable/unconfigured.
+let newsCache = [...SEED_NEWS];
+let updatesCache = [...SEED_UPDATES];
+let achievementsCache = [...SEED_ACHIEVEMENTS];
+
+async function loadNewsFromSheet(){
+  const rows = await fetchSheet(SHEET_CSV.news);
+  if (rows) newsCache = rows.map(rowToNewsItem).filter(i => i.title);
+}
+async function loadUpdatesFromSheet(){
+  const rows = await fetchSheet(SHEET_CSV.updates);
+  if (rows) updatesCache = rows.map(rowToUpdateItem).filter(i => i.title);
+}
+async function loadAchievementsFromSheet(){
+  const rows = await fetchSheet(SHEET_CSV.achievements);
+  if (rows) achievementsCache = rows.map(rowToAchievementItem).filter(i => i.title);
+}
+
+async function refreshAllFromSheet(){
+  await Promise.all([
+    loadNewsFromSheet(),
+    loadUpdatesFromSheet(),
+    loadAchievementsFromSheet()
+  ]);
+  renderAllNews();
+  renderUpdates();
+  renderAchievements();
+}
+
+/* ---------------------------------------------------------
+   localize(): picks Malayalam text for an item when Malayalam
+   is active. Priority: a static SEED_*_ML entry (for fallback
+   seed content) wins if present; otherwise uses the item's own
+   _ml fields (populated directly from the Sheet's *_ml columns).
+   Falls back to the English/original text if no translation is
+   available for that field, so a client who only fills in
+   English never sees a blank card.
+   --------------------------------------------------------- */
+function localize(item, translationMap){
+  const lang = getCurrentLang();
+  if (lang !== "ml") return item;
+  const seedTr = translationMap[item.id];
+  if (seedTr) return Object.assign({}, item, seedTr);
+  if (item._ml){
+    const filled = {};
+    Object.entries(item._ml).forEach(([k, v]) => { if (v) filled[k] = v; });
+    return Object.assign({}, item, filled);
+  }
+  return item;
+}
+
+/* =========================================================
+   NEWS LIFECYCLE (unchanged logic, now reads from newsCache)
+   ========================================================= */
 function purgeExpired(items){
   const cutoff = Date.now() - ARCHIVE_LIFETIME_DAYS * DAY_MS;
   return items.filter(item => new Date(item.date).getTime() >= cutoff);
@@ -567,26 +674,6 @@ function purgeExpired(items){
 function ageInDays(item){
   return Math.floor((Date.now() - new Date(item.date).getTime()) / DAY_MS);
 }
-
-// Adds a new story. Call this from a console or an admin tool later:
-// addNewsItem({ title, summary, image })
-function addNewsItem({ title, summary, image }){
-  const items = loadNews();
-  const id = "n" + Date.now();
-  items.unshift({
-    id,
-    title, summary,
-    image: image || "images/news-placeholder.jpg",
-    date: new Date().toISOString()
-  });
-  saveNews(items);
-  renderAllNews();
-
-  // Fetch + cache the Malayalam version in the background so the
-  // language toggle works on this item too, then re-render.
-  translateAndCache(id, { title, summary }, STORAGE_KEY, renderAllNews);
-}
-window.addNewsItem = addNewsItem;
 
 /* =========================================================
    RENDERING
@@ -619,11 +706,6 @@ function escapeHTML(str){
   return div.innerHTML;
 }
 
-/* ---- Uniform news card (used in the scrollable "Latest" grid) ----
-   Every card shares one fixed height (see .news-card in styles.css)
-   with the title/summary clamped to a set number of lines, so all
-   boxes in the grid are exactly the same size regardless of how
-   long any individual story's text is. */
 function newsCardHTML(item, isFresh){
   return `
     <article class="news-card">
@@ -643,7 +725,6 @@ function newsCardHTML(item, isFresh){
     </article>`;
 }
 
-/* ---- Compact list row (used for the Old News archive) ---- */
 function newsListItemHTML(item){
   return `
     <article class="news-list-item">
@@ -660,24 +741,18 @@ function newsListItemHTML(item){
 }
 
 function renderAllNews(){
-  let items = purgeExpired(loadNews());
-  saveNews(items);
-  // newest first
+  let items = purgeExpired(newsCache);
   items = items.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const latest = items.filter(i => ageInDays(i) < LATEST_WINDOW_DAYS);
   const old = items.filter(i => ageInDays(i) >= LATEST_WINDOW_DAYS);
 
-  // Home tab: every "latest" story rendered as an identically-sized
-  // card inside a scrollable panel, so 5-7 stories are all reachable
-  // without the page growing taller.
   const latestGrid = document.getElementById("latestNewsGrid");
   const toShow = latest.slice(0, LATEST_DISPLAY_COUNT);
 
   latestGrid.innerHTML = toShow.map(i => newsCardHTML(localize(i, SEED_NEWS_ML), true)).join("");
   document.getElementById("latestEmptyState").hidden = toShow.length > 0;
 
-  // Old News tab: full archive as a compact list.
   const oldGrid = document.getElementById("oldNewsGrid");
   oldGrid.innerHTML = old.map(i => newsListItemHTML(localize(i, SEED_NEWS_ML))).join("");
   document.getElementById("oldEmptyState").hidden = old.length > 0;
@@ -699,12 +774,7 @@ function renderGallery(){
 }
 
 /* =========================================================
-   HOME CAROUSEL — lightweight vanilla JS/CSS carousel with
-   Bootstrap-style behavior (indicator dots, prev/next arrows,
-   auto-rotate, pause on hover/touch). Slides are built from the
-   same GALLERY_IMAGES used in the Gallery tab, so it stays in
-   sync with whatever images/captions live there (including
-   Malayalam captions when that language is active).
+   HOME CAROUSEL — unchanged from original
    ========================================================= */
 const CAROUSEL_INTERVAL_MS = 4500;
 let carouselIndex = 0;
@@ -722,7 +792,6 @@ function renderCarousel(){
 
   track.innerHTML = GALLERY_IMAGES.map(img => {
     const caption = carouselSlideCaption(img);
-    // Semantic alt text describes the specific image for screen readers.
     return `
       <div class="carousel-slide">
         <img src="${img.src}" alt="${escapeHTML(caption)}" loading="lazy"
@@ -781,7 +850,7 @@ function initCarousel(){
 
   document.getElementById("carouselNext").addEventListener("click", () => {
     carouselNext();
-    startCarouselAutoplay(); // restart timer so manual nav doesn't fight autoplay
+    startCarouselAutoplay();
   });
   document.getElementById("carouselPrev").addEventListener("click", () => {
     carouselPrev();
@@ -794,7 +863,6 @@ function initCarousel(){
     startCarouselAutoplay();
   });
 
-  // Pause on hover (mouse) and touch (mobile), resume on leave/end.
   carousel.addEventListener("mouseenter", stopCarouselAutoplay);
   carousel.addEventListener("mouseleave", startCarouselAutoplay);
   carousel.addEventListener("touchstart", stopCarouselAutoplay, { passive: true });
@@ -802,52 +870,8 @@ function initCarousel(){
 }
 
 /* ---------------------------------------------------------
-   Important Updates — storage + rendering
+   Important Updates — rendering (data now from updatesCache)
    --------------------------------------------------------- */
-const UPDATES_STORAGE_KEY = "cherukolConnectUpdates";
-
-function loadUpdates(){
-  try{
-    const raw = localStorage.getItem(UPDATES_STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(UPDATES_STORAGE_KEY, JSON.stringify(SEED_UPDATES));
-      return [...SEED_UPDATES];
-    }
-    return JSON.parse(raw);
-  }catch(e){
-    console.warn("Could not read stored updates, using seed data.", e);
-    return [...SEED_UPDATES];
-  }
-}
-
-function saveUpdates(items){
-  try{
-    localStorage.setItem(UPDATES_STORAGE_KEY, JSON.stringify(items));
-  }catch(e){
-    console.warn("Could not save updates to this browser.", e);
-  }
-}
-
-// Adds a new update. Call from a console or an admin tool later:
-// addUpdateItem({ tag, title, detail, priority }) — priority is "urgent" or "notice"
-function addUpdateItem({ tag, title, detail, priority }){
-  const items = loadUpdates();
-  const id = "u" + Date.now();
-  const finalTag = tag || "Notice";
-  items.unshift({
-    id,
-    tag: finalTag,
-    title, detail,
-    date: new Date().toISOString(),
-    priority: priority === "urgent" ? "urgent" : "notice"
-  });
-  saveUpdates(items);
-  renderUpdates();
-
-  translateAndCache(id, { tag: finalTag, title, detail }, UPDATES_STORAGE_KEY, renderUpdates);
-}
-window.addUpdateItem = addUpdateItem;
-
 function bellIconSVG(){
   return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -871,56 +895,15 @@ function updateItemHTML(item){
 }
 
 function renderUpdates(){
-  const items = loadUpdates().slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+  const items = updatesCache.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
   const grid = document.getElementById("updatesGrid");
   grid.innerHTML = items.map(i => updateItemHTML(localize(i, SEED_UPDATES_ML))).join("");
   document.getElementById("updatesEmptyState").hidden = items.length > 0;
 }
 
 /* ---------------------------------------------------------
-   Achievements — storage + rendering
+   Achievements — rendering (data now from achievementsCache)
    --------------------------------------------------------- */
-const ACHIEVEMENTS_STORAGE_KEY = "cherukolConnectAchievements";
-
-function loadAchievements(){
-  try{
-    const raw = localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(SEED_ACHIEVEMENTS));
-      return [...SEED_ACHIEVEMENTS];
-    }
-    return JSON.parse(raw);
-  }catch(e){
-    console.warn("Could not read stored achievements, using seed data.", e);
-    return [...SEED_ACHIEVEMENTS];
-  }
-}
-
-function saveAchievements(items){
-  try{
-    localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(items));
-  }catch(e){
-    console.warn("Could not save achievements to this browser.", e);
-  }
-}
-
-// Adds a new achievement. Call from a console or an admin tool later:
-// addAchievement({ year, title, detail })
-function addAchievement({ year, title, detail }){
-  const items = loadAchievements();
-  const id = "a" + Date.now();
-  items.unshift({
-    id,
-    year: year || String(new Date().getFullYear()),
-    title, detail
-  });
-  saveAchievements(items);
-  renderAchievements();
-
-  translateAndCache(id, { title, detail }, ACHIEVEMENTS_STORAGE_KEY, renderAchievements);
-}
-window.addAchievement = addAchievement;
-
 function trophyIconSVG(){
   return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M8 21h8M12 17v4"/>
@@ -943,10 +926,9 @@ function achievementCardHTML(item){
 }
 
 function renderAchievements(){
-  const items = loadAchievements();
   const grid = document.getElementById("achievementsGrid");
-  grid.innerHTML = items.map(i => achievementCardHTML(localize(i, SEED_ACHIEVEMENTS_ML))).join("");
-  document.getElementById("achievementsEmptyState").hidden = items.length > 0;
+  grid.innerHTML = achievementsCache.map(i => achievementCardHTML(localize(i, SEED_ACHIEVEMENTS_ML))).join("");
+  document.getElementById("achievementsEmptyState").hidden = achievementsCache.length > 0;
 }
 
 /* =========================================================
@@ -1021,9 +1003,6 @@ function initContactForm(){
 
 /* =========================================================
    RESPONSIVE BREAKPOINT DEBUG ATTRIBUTE
-   Tags <html data-breakpoint="sm|md|lg|xl"> on load/resize so
-   you can visually confirm which breakpoint is active while
-   testing the news grid (or anything else) in devtools.
    ========================================================= */
 function currentBreakpointLabel(width){
   if (width >= 1440) return "xl";
@@ -1039,11 +1018,15 @@ function updateBreakpointAttr(){
 /* =========================================================
    INIT
    ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
   document.getElementById("todayDate").textContent = formatDate(new Date().toISOString());
 
   initNav();
+
+  // Render immediately with seed/cached data so the page never
+  // looks empty while the Sheet fetch is in flight, then swap in
+  // real content the moment it arrives.
   renderAllNews();
   renderUpdates();
   renderAchievements();
@@ -1056,7 +1039,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("resize", updateBreakpointAttr);
 
-  // Re-check for expired/aged-over stories once an hour, in case
-  // the page is left open across a day boundary.
-  setInterval(renderAllNews, 60 * 60 * 1000);
+  // Pull real content from the Google Sheet (falls back silently
+  // to seed data if not configured yet or unreachable).
+  await refreshAllFromSheet();
+
+  // Keep content fresh for anyone who leaves a tab open, and
+  // re-check the two-day/one-week aging windows periodically.
+  setInterval(refreshAllFromSheet, SHEET_REFRESH_MS);
 });
