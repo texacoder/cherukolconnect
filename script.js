@@ -144,7 +144,9 @@ const I18N = {
     "card.today": "Today",
     "card.daysAgo1": "1 day ago",
     "card.daysAgoN": "{n} days ago",
-    "carousel.goTo": "Go to slide"
+    "carousel.goTo": "Go to slide",
+    "card.readMore": "Read more",
+    "card.close": "Close"
   },
   ml: {
     "nav.home": "ഹോം",
@@ -213,7 +215,9 @@ const I18N = {
     "card.today": "ഇന്ന്",
     "card.daysAgo1": "1 ദിവസം മുമ്പ്",
     "card.daysAgoN": "{n} ദിവസം മുമ്പ്",
-    "carousel.goTo": "സ്ലൈഡിലേക്ക് പോകുക"
+    "carousel.goTo": "സ്ലൈഡിലേക്ക് പോകുക",
+    "card.readMore": "കൂടുതൽ വായിക്കുക",
+    "card.close": "അടയ്ക്കുക"
   }
 };
 
@@ -402,6 +406,11 @@ let newsCache = [];
 let updatesCache = [];
 let achievementsCache = [];
 
+// Tracks which news card is currently expanded (blog-style
+// read-more), keyed by item id, so it survives re-renders
+// triggered by language switches or Sheet refreshes.
+let expandedNewsId = null;
+
 async function loadNewsFromSheet(){
   const rows = await fetchSheet(SHEET_CSV.news);
   if (rows) newsCache = rows.map(rowToNewsItem).filter(i => i.title);
@@ -488,9 +497,30 @@ function escapeHTML(str){
   return div.innerHTML;
 }
 
+/* ---------------------------------------------------------
+   Blog-style expand/collapse for a news card's summary.
+   Clicking the title (or the read-more link) toggles an
+   inline panel open with the full summary text, instead of
+   navigating anywhere. Only one card is expanded at a time.
+   --------------------------------------------------------- */
+function toggleNewsExpand(id){
+  expandedNewsId = (expandedNewsId === id) ? null : id;
+  renderAllNews();
+
+  // Scroll the opened card into view within the scroll panel.
+  if (expandedNewsId){
+    requestAnimationFrame(() => {
+      const el = document.querySelector(`.news-card[data-id="${CSS.escape(id)}"]`);
+      if (el) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+  }
+}
+window.toggleNewsExpand = toggleNewsExpand;
+
 function newsCardHTML(item, isFresh){
+  const isOpen = expandedNewsId === item.id;
   return `
-    <article class="news-card">
+    <article class="news-card ${isOpen ? "is-open" : ""}" data-id="${escapeHTML(item.id)}">
       <div class="news-card-img">
         <img src="${item.image}" alt="" loading="lazy"
              onerror="this.parentElement.innerHTML = placeholderSVG();">
@@ -500,23 +530,38 @@ function newsCardHTML(item, isFresh){
           <span class="pill ${isFresh ? "pill-fresh" : ""}">${isFresh ? t("card.latest") : t("card.archive")}</span>
           <span>${ageLabelFor(item)}</span>
         </div>
-        <h3>${escapeHTML(item.title)}</h3>
-        <p>${escapeHTML(item.summary)}</p>
+        <h3 class="news-card-title" role="button" tabindex="0" aria-expanded="${isOpen}"
+            onclick="toggleNewsExpand('${item.id}')"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleNewsExpand('${item.id}');}">
+          ${escapeHTML(item.title)}
+        </h3>
+        <p class="${isOpen ? "news-card-summary-full" : ""}">${escapeHTML(item.summary)}</p>
+        <button type="button" class="news-readmore" onclick="toggleNewsExpand('${item.id}')">
+          ${isOpen ? t("card.close") : t("card.readMore")}
+        </button>
         <div class="news-card-footer">${formatDate(item.date)}</div>
       </div>
     </article>`;
 }
 
 function newsListItemHTML(item){
+  const isOpen = expandedNewsId === item.id;
   return `
-    <article class="news-list-item">
+    <article class="news-list-item ${isOpen ? "is-open" : ""}" data-id="${escapeHTML(item.id)}">
       <div class="news-list-thumb">
         <img src="${item.image}" alt="" loading="lazy"
              onerror="this.parentElement.innerHTML = placeholderSVG();">
       </div>
       <div class="news-list-body">
-        <h3>${escapeHTML(item.title)}</h3>
-        <p>${escapeHTML(item.summary)}</p>
+        <h3 class="news-card-title" role="button" tabindex="0" aria-expanded="${isOpen}"
+            onclick="toggleNewsExpand('${item.id}')"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleNewsExpand('${item.id}');}">
+          ${escapeHTML(item.title)}
+        </h3>
+        <p class="${isOpen ? "news-card-summary-full" : ""}">${escapeHTML(item.summary)}</p>
+        <button type="button" class="news-readmore" onclick="toggleNewsExpand('${item.id}')">
+          ${isOpen ? t("card.close") : t("card.readMore")}
+        </button>
       </div>
       <div class="news-list-meta">${formatDate(item.date)}</div>
     </article>`;
