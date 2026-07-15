@@ -922,6 +922,59 @@ main{
   .news-card{ transition: none; }
 }
 
+/* =========================================================
+   BLOG-STYLE EXPAND/COLLAPSE — supports script.js's
+   toggleNewsExpand(): clicking a news title (or its
+   read-more/close button) toggles the ".is-open" state so
+   the full summary shows inline instead of navigating away.
+   Without these rules the JS state changes but nothing is
+   visible, because the card height is fixed and the summary
+   text is line-clamped elsewhere in this file.
+   ========================================================= */
+.news-card-title{ cursor: pointer; }
+.news-card-title:hover{ color: var(--forest); }
+
+.news-readmore{
+  background: none;
+  border: none;
+  padding: 0;
+  align-self: flex-start;
+  color: var(--forest);
+  font-weight: 700;
+  font-size: .82rem;
+  text-decoration: underline;
+}
+.news-readmore:hover{ color: var(--forest-dark); }
+
+/* Lifts the 2-line clamp (and the old-news nowrap+ellipsis)
+   so the full summary text can display once a card is open. */
+.news-card-summary-full{
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  text-overflow: unset !important;
+}
+
+/* Let an open "Latest" card grow past the fixed 360px height
+   to fit its full summary, instead of clipping it. */
+.news-card.is-open{
+  height: auto !important;
+}
+.news-card.is-open .news-card-body{
+  overflow: visible;
+}
+
+/* Same idea for the compact Old News list rows: the title and
+   summary normally truncate with an ellipsis on one line —
+   let them wrap fully while that row is open. */
+.news-list-item.is-open .news-list-body h3,
+.news-list-item.is-open .news-list-body p{
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
+
 /* Visible keyboard focus */
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
   outline: 2px solid var(--gold);
