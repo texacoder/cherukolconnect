@@ -988,6 +988,27 @@ main{
   overflow: visible;
 }
 
+/* Desktop-only: once a "Latest" card is open the card grows tall
+   under a fixed 150px image band, which reads as cramped in the
+   wide grid. Give the image a little more height and the body a
+   touch more breathing room on wider screens so an open card looks
+   like a deliberate expanded article — image on top, text below —
+   rather than a stretched version of the closed card. Mobile is
+   untouched (this block only applies at 761px and above). */
+@media (min-width: 761px){
+  .news-card.is-open .news-card-img{
+    height: 200px;
+    flex-basis: 200px;
+  }
+  .news-card.is-open .news-card-body{
+    padding: 20px 22px 22px;
+    gap: 10px;
+  }
+  .news-card.is-open .news-card-summary-full{
+    line-height: 1.6;
+  }
+}
+
 /* Same idea for the compact Old News list rows: the title and
    summary normally truncate with an ellipsis on one line —
    let them wrap fully while that row is open. On wide/desktop
@@ -1026,3 +1047,4 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
+
