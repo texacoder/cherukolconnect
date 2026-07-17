@@ -1009,42 +1009,8 @@ main{
   }
 }
 
-/* Same idea for the compact Old News list rows: the title and
-   summary normally truncate with an ellipsis on one line —
-   let them wrap fully while that row is open. On wide/desktop
-   screens the row uses a side-by-side thumbnail + body layout,
-   so once the body text wraps onto multiple lines we also
-   switch the row to align items to the top (instead of center)
-   and give the thumbnail a little breathing room, so an open
-   row looks like a deliberate expanded card rather than a
-   lopsided mobile-style stack squeezed into a wide row. */
-.news-list-item.is-open{
-  align-items: flex-start;
-  padding: 16px;
-}
-.news-list-item.is-open .news-list-thumb{
-  margin-top: 2px;
-}
-.news-list-item.is-open .news-list-body h3,
-.news-list-item.is-open .news-list-body p{
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
-}
-.news-list-item.is-open .news-list-body{
-  gap: 6px;
-}
-.news-list-item.is-open .news-list-body p{
-  line-height: 1.55;
-}
-.news-list-item.is-open .news-list-meta{
-  align-self: flex-start;
-  padding-top: 2px;
-}
-
 /* Visible keyboard focus */
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
-
