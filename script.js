@@ -56,21 +56,21 @@ const DAY_MS = 24 * 60 * 60 * 1000;
    array directly to change the photos on display.
    ========================================================= */
 const GALLERY_IMAGES = [
-  { src: "images/gallery-office.jpg",  caption: "Panchayath Office" },
-  { src: "images/gallery-hall.jpg",    caption: "Community Hall" },
-  { src: "images/gallery-market.jpg",  caption: "Local Market" },
-  { src: "images/gallery-park.jpg",    caption: "Village Park" },
-  { src: "images/gallery-temple.jpg",  caption: "Temple Grounds" },
-  { src: "images/gallery-school.jpg",  caption: "Government School" }
+  { src: "img.jpg",  caption: "Panchayath Office" },
+  { src: "img.jpg",    caption: "Community Hall" },
+  { src: "img.jpg",  caption: "Local Market" },
+  { src: "img.jpg",    caption: "Village Park" },
+  { src: "img.jpg",  caption: "Temple Grounds" },
+  { src: "img.jpg",  caption: "Government School" }
 ];
 
 const GALLERY_CAPTIONS_ML = {
-  "images/gallery-office.jpg": "പഞ്ചായത്ത് ഓഫീസ്",
-  "images/gallery-hall.jpg": "കമ്മ്യൂണിറ്റി ഹാൾ",
-  "images/gallery-market.jpg": "പ്രാദേശിക മാർക്കറ്റ്",
-  "images/gallery-park.jpg": "ഗ്രാമ പാർക്ക്",
-  "images/gallery-temple.jpg": "ക്ഷേത്ര മൈതാനം",
-  "images/gallery-school.jpg": "സർക്കാർ സ്കൂൾ"
+  "img.jpg": "പഞ്ചായത്ത് ഓഫീസ്",
+  "img.jpg": "കമ്മ്യൂണിറ്റി ഹാൾ",
+  "img.jpg": "പ്രാദേശിക മാർക്കറ്റ്",
+  "img.jpg": "ഗ്രാമ പാർക്ക്",
+  "img.jpg": "ക്ഷേത്ര മൈതാനം",
+  "img.jpg": "സർക്കാർ സ്കൂൾ"
 };
 
 /* =========================================================
