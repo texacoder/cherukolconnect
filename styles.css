@@ -257,6 +257,20 @@ main{
 .hero h2{ font-size: 2rem; }
 .hero-sub{ color: var(--ink-soft); margin-top: 8px; }
 
+/* ---------------------------------------------------------
+   Malayalam taglines — short, standalone brand/section lines
+   set in Noto Sans Malayalam regardless of the active site
+   language, styled as a quiet gold accent beneath the heading.
+   --------------------------------------------------------- */
+.hero-tagline-ml{
+  font-family: var(--font-body-ml);
+  font-weight: 600;
+  font-size: 1.02rem;
+  color: var(--gold-deep);
+  margin: 2px 0 0;
+  letter-spacing: .01em;
+}
+
 .link-btn{
   background:none; border:none; text-decoration: underline;
   color: var(--forest); font-weight:600; padding:0; font-size: inherit;
@@ -821,6 +835,14 @@ main{
   display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;
   font-size: .85rem; color: rgba(255,255,255,.75);
 }
+.footer-main{ display: flex; flex-direction: column; gap: 4px; }
+.footer-tagline-ml{
+  font-family: var(--font-body-ml);
+  font-weight: 600;
+  font-size: .84rem;
+  color: var(--gold-light);
+  margin: 0;
+}
 .footer-links{ display:flex; gap:16px; flex-wrap:wrap; }
 .footer-links .link-btn{ color: var(--gold-light); text-decoration:none; font-size:.85rem; }
 .footer-links .link-btn:hover{ text-decoration: underline; }
@@ -876,6 +898,7 @@ main{
   .hero h2{ font-size: 1.4rem; }
   .hero-sub{ font-size: .92rem; }
   .eyebrow{ font-size: .72rem; }
+  .hero-tagline-ml{ font-size: .92rem; }
 
   .news-grid{ grid-template-columns: 1fr; }
   .news-card{ height: auto; min-height: 300px; }
@@ -967,12 +990,35 @@ main{
 
 /* Same idea for the compact Old News list rows: the title and
    summary normally truncate with an ellipsis on one line —
-   let them wrap fully while that row is open. */
+   let them wrap fully while that row is open. On wide/desktop
+   screens the row uses a side-by-side thumbnail + body layout,
+   so once the body text wraps onto multiple lines we also
+   switch the row to align items to the top (instead of center)
+   and give the thumbnail a little breathing room, so an open
+   row looks like a deliberate expanded card rather than a
+   lopsided mobile-style stack squeezed into a wide row. */
+.news-list-item.is-open{
+  align-items: flex-start;
+  padding: 16px;
+}
+.news-list-item.is-open .news-list-thumb{
+  margin-top: 2px;
+}
 .news-list-item.is-open .news-list-body h3,
 .news-list-item.is-open .news-list-body p{
   white-space: normal;
   overflow: visible;
   text-overflow: unset;
+}
+.news-list-item.is-open .news-list-body{
+  gap: 6px;
+}
+.news-list-item.is-open .news-list-body p{
+  line-height: 1.55;
+}
+.news-list-item.is-open .news-list-meta{
+  align-self: flex-start;
+  padding-top: 2px;
 }
 
 /* Visible keyboard focus */
@@ -980,4 +1026,3 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
-
