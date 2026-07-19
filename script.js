@@ -3,15 +3,15 @@
    ========================================================= */
 // WhatsApp number that complaints are sent to, in international
 // format with no + or spaces (country code + number).
-const WHATSAPP_NUMBER = "919999999999"; // TODO: replace with the real office WhatsApp number
+const WHATSAPP_NUMBER = "918078460042"; // TODO: replace with the real office WhatsApp number
 
 // Email address the contact form composes a message to.
-const CONTACT_EMAIL = "office@cherukolconnect.gov.in"; // TODO: replace with real email
+const CONTACT_EMAIL = "jishnur401@gmail.com"; // TODO: replace with real email
 
 // A story counts as "latest" for this many days, then moves to Old News.
-const LATEST_WINDOW_DAYS = 2;
+const LATEST_WINDOW_DAYS = 5;
 // A story is removed completely this many days after it was published.
-const ARCHIVE_LIFETIME_DAYS = 7;
+const ARCHIVE_LIFETIME_DAYS = 20;
 
 // How many of the freshest stories to show in the scrollable
 // "Latest from your Panchayath" grid on the home page.
@@ -409,6 +409,8 @@ let achievementsCache = [];
 // Tracks which news card is currently expanded (blog-style
 // read-more), keyed by item id, so it survives re-renders
 // triggered by language switches or Sheet refreshes.
+// NOTE: only used by the Old News list now — the home page
+// "Latest" cards open a full article in a new tab instead.
 let expandedNewsId = null;
 
 async function loadNewsFromSheet(){
@@ -499,9 +501,10 @@ function escapeHTML(str){
 
 /* ---------------------------------------------------------
    Blog-style expand/collapse for a news card's summary.
-   Clicking the title (or the read-more link) toggles an
-   inline panel open with the full summary text, instead of
-   navigating anywhere. Only one card is expanded at a time.
+   Still used by the Old News archive list: clicking a title
+   (or its read-more/close button) toggles an inline panel
+   open with the full summary text, instead of navigating away.
+   Only one card is expanded at a time.
    --------------------------------------------------------- */
 function toggleNewsExpand(id){
   expandedNewsId = (expandedNewsId === id) ? null : id;
@@ -517,10 +520,88 @@ function toggleNewsExpand(id){
 }
 window.toggleNewsExpand = toggleNewsExpand;
 
+/* ---------------------------------------------------------
+   Home page "Latest" cards: opens the full article on its own
+   page in a new browser tab, instead of expanding inline.
+   Builds a small standalone HTML document on the fly (styled
+   to match the site's forest/gold theme) and opens it via a
+   Blob URL — no server route or extra file needed.
+   --------------------------------------------------------- */
+function openNewsArticle(id){
+  const item = newsCache.find(i => i.id === id);
+  if (!item) return;
+  const localized = localize(item);
+
+  const title = escapeHTML(localized.title);
+  const summary = escapeHTML(localized.summary);
+  const dateStr = escapeHTML(formatDate(localized.date));
+  const lang = getCurrentLang();
+  const image = localized.image;
+
+  const articleHTML = `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title} — Cherukol Connect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --white:#FFFFFF; --paper:#FBFBF9; --ink:#1C2620; --ink-soft:#4E5A52;
+    --forest:#0F4C33; --forest-dark:#0A3323; --forest-light:#E7F1EB;
+    --gold:#B8860B; --gold-light:#E9CE6D; --gold-deep:#8A6A16;
+    --metal-gold: linear-gradient(120deg, var(--gold-deep) 0%, var(--gold) 22%, var(--gold-light) 45%, #FFF3C4 52%, var(--gold-light) 60%, var(--gold) 80%, var(--gold-deep) 100%);
+    --font-display:'Rozha One', serif;
+    --font-body: ${lang === "ml" ? "'Noto Sans Malayalam', 'Mukta', sans-serif" : "'Mukta', sans-serif"};
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-body); line-height:1.7; }
+  .kasavu-border{
+    height:10px; width:100%;
+    background:
+      linear-gradient(135deg, transparent 50%, var(--gold-light) 50%) 0 0/14px 14px repeat-x,
+      linear-gradient(-135deg, transparent 50%, var(--gold-light) 50%) 0 0/14px 14px repeat-x,
+      var(--metal-gold);
+    background-position: 0 0, 7px 0, 0 0;
+  }
+  header{ background:var(--forest-dark); color:var(--white); padding:16px 20px; }
+  header a{ color:var(--gold-light); text-decoration:none; font-weight:700; font-size:.9rem; }
+  main{ max-width:720px; margin:0 auto; padding:32px 20px 60px; }
+  .meta{ display:flex; gap:10px; align-items:center; font-size:.8rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; margin-bottom:10px; }
+  .pill{ background:var(--forest); color:var(--white); padding:3px 10px; border-radius:999px; font-weight:700; }
+  h1{ font-family:var(--font-display); font-weight:400; color:var(--forest-dark); font-size:2rem; margin:0 0 18px; line-height:1.25; }
+  .article-img{ width:100%; max-height:360px; object-fit:cover; border-radius:10px; margin-bottom:22px; background:linear-gradient(135deg, var(--forest-light), #D8E9DE); display:block; }
+  p.body-text{ font-size:1.05rem; color:var(--ink); white-space:pre-wrap; }
+  footer{ background:var(--forest-dark); color:rgba(255,255,255,.75); text-align:center; padding:16px; font-size:.8rem; margin-top:40px; }
+</style>
+</head>
+<body>
+  <div class="kasavu-border"></div>
+  <header><a href="javascript:window.close()">&larr; Cherukol Connect</a></header>
+  <main>
+    <div class="meta"><span class="pill">${lang === "ml" ? "പുതിയത്" : "Latest"}</span><span>${dateStr}</span></div>
+    <h1>${title}</h1>
+    <img class="article-img" src="${image}" alt="" onerror="this.style.display='none';">
+    <p class="body-text">${summary}</p>
+  </main>
+  <footer>Cherukol Connect — Panchayath News &amp; Services</footer>
+</body>
+</html>`;
+
+  const blob = new Blob([articleHTML], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank", "noopener");
+}
+window.openNewsArticle = openNewsArticle;
+
 function newsCardHTML(item, isFresh){
-  const isOpen = expandedNewsId === item.id;
+  // Home page "Latest" cards (isFresh === true) open the full
+  // article in a new tab. Old News list items (isFresh === false,
+  // rendered via newsListItemHTML below) keep the inline expand.
   return `
-    <article class="news-card ${isOpen ? "is-open" : ""}" data-id="${escapeHTML(item.id)}">
+    <article class="news-card" data-id="${escapeHTML(item.id)}">
       <div class="news-card-img">
         <img src="${item.image}" alt="" loading="lazy"
              onerror="this.parentElement.innerHTML = placeholderSVG();">
@@ -530,14 +611,14 @@ function newsCardHTML(item, isFresh){
           <span class="pill ${isFresh ? "pill-fresh" : ""}">${isFresh ? t("card.latest") : t("card.archive")}</span>
           <span>${ageLabelFor(item)}</span>
         </div>
-        <h3 class="news-card-title" role="button" tabindex="0" aria-expanded="${isOpen}"
-            onclick="toggleNewsExpand('${item.id}')"
-            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleNewsExpand('${item.id}');}">
+        <h3 class="news-card-title" role="button" tabindex="0"
+            onclick="openNewsArticle('${item.id}')"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNewsArticle('${item.id}');}">
           ${escapeHTML(item.title)}
         </h3>
-        <p class="${isOpen ? "news-card-summary-full" : ""}">${escapeHTML(item.summary)}</p>
-        <button type="button" class="news-readmore" onclick="toggleNewsExpand('${item.id}')">
-          ${isOpen ? t("card.close") : t("card.readMore")}
+        <p>${escapeHTML(item.summary)}</p>
+        <button type="button" class="news-readmore" onclick="openNewsArticle('${item.id}')">
+          ${t("card.readMore")}
         </button>
         <div class="news-card-footer">${formatDate(item.date)}</div>
       </div>
