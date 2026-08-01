@@ -4,6 +4,50 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cherukol Connect — Panchayath News &amp; Services</title>
+
+<!-- ===== SEO: core meta tags ===== -->
+<meta name="description" content="Cherukol Connect is the official news and services portal for Cherukol Grama Panchayath, Kerala. Get the latest updates, announcements, achievements, gallery, and file complaints online.">
+<meta name="keywords" content="Cherukol Grama Panchayath, Cherukol Connect, Kerala panchayath, panchayath news, panchayath services, grama panchayath, file complaint panchayath, ചെറുകോൽ ഗ്രാമപഞ്ചായത്ത്">
+<meta name="author" content="Cherukol Grama Panchayath">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://cherukolconnect.in/">
+
+<!-- ===== SEO: Open Graph (Facebook/WhatsApp link previews) ===== -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cherukol Connect">
+<meta property="og:title" content="Cherukol Connect — Panchayath News &amp; Services">
+<meta property="og:description" content="Official news and services portal for Cherukol Grama Panchayath, Kerala. Latest updates, achievements, gallery, and online complaint filing.">
+<meta property="og:image" content="https://cherukolconnect.gov.in/logo.png">
+<meta property="og:url" content="https://cherukolconnect.gov.in/">
+<meta property="og:locale" content="en_IN">
+<meta property="og:locale:alternate" content="ml_IN">
+
+<!-- ===== SEO: Twitter Card ===== -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Cherukol Connect — Panchayath News &amp; Services">
+<meta name="twitter:description" content="Official news and services portal for Cherukol Grama Panchayath, Kerala.">
+<meta name="twitter:image" content="https://cherukolconnect.gov.in/logo.png">
+
+<!-- ===== SEO: favicon (reuses existing logo) ===== -->
+<link rel="icon" type="image/png" href="logo.png">
+
+<!-- ===== SEO: structured data for local government org ===== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "GovernmentOrganization",
+  "name": "Cherukol Grama Panchayath",
+  "alternateName": "Cherukol Connect",
+  "url": "https://cherukolconnect.gov.in/",
+  "logo": "https://cherukolconnect.gov.in/logo.png",
+  "address": {
+    "@type": "PostalAddress",
+    "addressRegion": "Kerala",
+    "addressCountry": "IN"
+  }
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Rozha+One&family=Mukta:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -80,6 +124,8 @@
       <div class="news-grid" id="latestNewsGrid"></div>
     </div>
     <p class="empty-state" id="latestEmptyState" hidden><span data-i18n="home.emptyPre">No fresh updates right now &mdash; check back soon, or browse</span> <button class="link-btn" data-tab="oldnews" data-i18n="nav.oldnews">Old News</button>.</p>
+
+    <button type="button" class="btn-secondary report-issue-btn" data-tab="complaint" data-i18n="Report An Issue">Report an Issue</button>
 
   </section>
 
