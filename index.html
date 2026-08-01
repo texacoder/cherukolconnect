@@ -98,6 +98,18 @@
   <!-- ===== HOME / LATEST NEWS ===== -->
   <section class="tab-panel active" id="tab-home">
 
+    <!-- ===== LIVE RAIN / WEATHER ALERT — hidden unless an active alert
+         for the configured district is present in the sheet; polls on
+         the same auto-refresh cycle as the rest of the site content. ===== -->
+    <div class="weather-alert-banner" id="weatherAlertBanner" role="alert" hidden>
+      <span class="weather-alert-dot" aria-hidden="true"></span>
+      <div class="weather-alert-text">
+        <p class="weather-alert-headline" id="weatherAlertHeadline"></p>
+        <p class="weather-alert-detail" id="weatherAlertDetail"></p>
+      </div>
+      <span class="weather-alert-updated" id="weatherAlertUpdated"></span>
+    </div>
+
     <!-- Auto-rotating image carousel — highlights from the Gallery -->
     <div class="carousel" id="homeCarousel" role="region" aria-roledescription="carousel" aria-label="Panchayath highlights">
       <div class="carousel-track" id="carouselTrack"></div>
@@ -124,6 +136,18 @@
       <div class="news-grid" id="latestNewsGrid"></div>
     </div>
     <p class="empty-state" id="latestEmptyState" hidden><span data-i18n="home.emptyPre">No fresh updates right now &mdash; check back soon, or browse</span> <button class="link-btn" data-tab="oldnews" data-i18n="nav.oldnews">Old News</button>.</p>
+
+    <!-- ===== HELP DESK — quick-dial contacts for officials & ward members ===== -->
+    <div class="helpdesk-section">
+      <div class="helpdesk-heading">
+        <p class="eyebrow" data-i18n="helpdesk.eyebrow">Quick Contacts</p>
+        <h2 data-i18n="helpdesk.title">Help Desk</h2>
+        <p class="hero-sub" data-i18n="helpdesk.sub">Reach out directly to Panchayath officials and ward members — tap a card to call.</p>
+      </div>
+      <div class="helpdesk-grid" id="helpDeskGrid"></div>
+      <p class="helpdesk-subhead" data-i18n="helpdesk.wardHeading">Ward Members</p>
+      <div class="helpdesk-grid helpdesk-grid-ward" id="helpDeskWardGrid"></div>
+    </div>
 
     <button type="button" class="btn-secondary report-issue-btn" data-tab="complaint" data-i18n="Report An Issue">Report an Issue</button>
 
