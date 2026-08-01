@@ -375,6 +375,101 @@ main{
 }
 
 /* =========================================================
+   LIVE RAIN / WEATHER ALERT BANNER — home page only, hidden
+   unless an active alert for the configured district exists.
+   Colour-coded to match the familiar red/orange/yellow IMD
+   alert levels; the small dot pulses to signal it's live and
+   auto-refreshing (same polling cycle as the rest of the
+   site's Sheet-driven content).
+   ========================================================= */
+.weather-alert-banner{
+  display:flex;
+  align-items:flex-start;
+  gap: 14px;
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin: 0 0 26px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid transparent;
+}
+.weather-alert-banner[hidden]{ display:none; }
+
+.weather-alert-dot{
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: 5px;
+  position: relative;
+}
+.weather-alert-dot::after{
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  animation: weatherAlertPulse 1.8s ease-out infinite;
+}
+
+.weather-alert-text{ flex: 1; min-width: 0; }
+.weather-alert-headline{
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  overflow-wrap: break-word;
+}
+.weather-alert-detail{
+  margin: 4px 0 0;
+  font-size: .88rem;
+  opacity: .9;
+  overflow-wrap: break-word;
+}
+
+.weather-alert-updated{
+  flex: 0 0 auto;
+  font-size: .74rem;
+  opacity: .75;
+  white-space: nowrap;
+}
+
+.weather-alert-banner.level-red{
+  background: linear-gradient(135deg, #FDEBEA, #FBD8D6);
+  border-color: rgba(178,32,32,.35);
+  color: #7A1616;
+}
+.weather-alert-banner.level-red .weather-alert-dot{ background: #D62828; }
+.weather-alert-banner.level-red .weather-alert-dot::after{ background: rgba(214,40,40,.35); }
+
+.weather-alert-banner.level-orange{
+  background: linear-gradient(135deg, #FFF1DE, #FFE3C0);
+  border-color: rgba(200,120,10,.35);
+  color: #7A4A08;
+}
+.weather-alert-banner.level-orange .weather-alert-dot{ background: #E08A1C; }
+.weather-alert-banner.level-orange .weather-alert-dot::after{ background: rgba(224,138,28,.35); }
+
+.weather-alert-banner.level-yellow{
+  background: linear-gradient(135deg, #FFFAE0, #FFF3B8);
+  border-color: rgba(180,150,10,.35);
+  color: #5C4A05;
+}
+.weather-alert-banner.level-yellow .weather-alert-dot{ background: #D4B106; }
+.weather-alert-banner.level-yellow .weather-alert-dot::after{ background: rgba(212,177,6,.35); }
+
+@keyframes weatherAlertPulse{
+  0%{ transform: scale(.4); opacity: .9; }
+  100%{ transform: scale(1.7); opacity: 0; }
+}
+
+@media (max-width: 480px){
+  .weather-alert-banner{ flex-direction: column; padding: 14px; gap: 8px; }
+  .weather-alert-updated{ align-self: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .weather-alert-dot::after{ animation: none; }
+}
+
+/* =========================================================
    HOME CAROUSEL — auto-rotating highlights, Bootstrap-style
    markup/behavior rebuilt in plain CSS/JS (no framework dep).
    Full-bleed on mobile via negative margins that cancel out
@@ -1128,4 +1223,127 @@ main{
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+}
+
+/* =========================================================
+   HELP DESK — quick-dial contact cards for the home page.
+   Mirrors the printed "Help Desk" poster (colour-coded role
+   icons + tap-to-call numbers) using the site's existing
+   forest/gold card language instead of an embedded image.
+   ========================================================= */
+.helpdesk-section{
+  margin: 44px 0 8px;
+  padding-top: 32px;
+  border-top: 1px dashed rgba(15,76,51,.16);
+}
+
+.helpdesk-heading{ max-width: 680px; margin-bottom: 20px; }
+.helpdesk-heading h2{ font-size: 1.8rem; padding-bottom: 12px; }
+
+.helpdesk-subhead{
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  color: var(--forest-dark);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin: 26px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.helpdesk-subhead::after{
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(184,134,11,.35), transparent);
+}
+
+.helpdesk-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.helpdesk-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--white);
+  border: 1px solid rgba(15,76,51,.08);
+  border-left: 4px solid var(--forest);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 12px 14px;
+  min-width: 0;
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.helpdesk-item:hover{ transform: translateY(-3px); box-shadow: var(--shadow); }
+.helpdesk-item:active{ transform: translateY(-1px); }
+
+.helpdesk-icon{
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,.12);
+}
+
+/* Colour variants — echo the printed poster's colour-coding
+   for each role/ward, applied to both the border and icon. */
+.helpdesk-green{ border-left-color: #2c8a3a; }
+.helpdesk-green .helpdesk-icon{ background: linear-gradient(135deg, #4dbb5e, #2c8a3a); }
+
+.helpdesk-orange{ border-left-color: #e08a1c; }
+.helpdesk-orange .helpdesk-icon{ background: linear-gradient(135deg, #f7b855, #e08a1c); }
+
+.helpdesk-blue{ border-left-color: #2f6fb5; }
+.helpdesk-blue .helpdesk-icon{ background: linear-gradient(135deg, #5c9fe0, #2f6fb5); }
+
+.helpdesk-purple{ border-left-color: #6a3e9e; }
+.helpdesk-purple .helpdesk-icon{ background: linear-gradient(135deg, #9b6fd1, #6a3e9e); }
+
+.helpdesk-brown{ border-left-color: #5f4029; }
+.helpdesk-brown .helpdesk-icon{ background: linear-gradient(135deg, #92694a, #5f4029); }
+
+.helpdesk-pink{ border-left-color: #c23a6d; }
+.helpdesk-pink .helpdesk-icon{ background: linear-gradient(135deg, #e874a3, #c23a6d); }
+
+.helpdesk-name{
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: .92rem;
+  overflow-wrap: break-word;
+}
+
+.helpdesk-phone{
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: .86rem;
+  color: var(--forest);
+  white-space: nowrap;
+  background: var(--forest-light);
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+.helpdesk-phone svg{ color: var(--gold-deep); flex-shrink: 0; }
+
+@media (max-width: 480px){
+  .helpdesk-section{ margin-top: 36px; padding-top: 26px; }
+  .helpdesk-heading h2{ font-size: 1.35rem; }
+  .helpdesk-grid{ grid-template-columns: 1fr; }
+  .helpdesk-item{ padding: 11px 12px; }
+  .helpdesk-icon{ width: 38px; height: 38px; }
+  .helpdesk-phone{ font-size: .8rem; padding: 4px 8px; }
 }
