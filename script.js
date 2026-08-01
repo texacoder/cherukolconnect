@@ -116,6 +116,45 @@ const HELP_DESK_WARD_MEMBERS = [
 ];
 
 /* =========================================================
+   EMERGENCY CONTACTS — district / taluk / forest division
+   control room numbers shown in the home page's "Emergency
+   Contacts" section (below Help Desk). Not sourced from the
+   Sheet; edit these directly to change names/numbers.
+   Sourced from the district's printed control-room poster.
+
+   - EMERGENCY_DEOC: the single district Collectorate Control
+     Room banner at the top, with its EN/ML label and one or
+     more numbers (landline, toll-free, mobile) each rendered
+     as its own tap-to-call chip.
+   - EMERGENCY_TEOC: one row per Taluk Control Room, rendered
+     with the same card style as Help Desk (`color` picks the
+     badge/accent colour from the .helpdesk-* classes).
+   - EMERGENCY_FOREST: Forest Division control rooms.
+   `phone` can be a landline (with STD code, e.g. "0468 2222221"),
+   a toll-free number (e.g. "1077"), or a 10-digit mobile number —
+   the tel: link is built appropriately for each in script below.
+   ========================================================= */
+const EMERGENCY_DEOC = {
+  name: "Collectorate Control Room (DEOC)",
+  nameML: "കളക്ടറേറ്റ് കൺട്രോൾ റും (DEOC)",
+  numbers: ["04682 322515", "1077", "+91 80788 08915"]
+};
+
+const EMERGENCY_TEOC = [
+  { name: "Kozhencherry Control Room", nameML: "കോഴഞ്ചേരി കൺട്രോൾ റും", phone: "0468 2222221", icon: "person", color: "blue"   },
+  { name: "Mallappally Control Room",  nameML: "മല്ലപ്പള്ളി കൺട്രോൾ റും", phone: "0469 2682293", icon: "person", color: "orange" },
+  { name: "Adoor Control Room",        nameML: "അടൂർ കൺട്രോൾ റും",       phone: "04734 224826",  icon: "person", color: "purple" },
+  { name: "Ranni Control Room",        nameML: "റാന്നി കൺട്രോൾ റും",     phone: "04735 227442",  icon: "person", color: "brown"  },
+  { name: "Thiruvalla Control Room",   nameML: "തിരുവല്ല കൺട്രോൾ റും",   phone: "0469 2601303",  icon: "person", color: "pink"   },
+  { name: "Konni Control Room",        nameML: "കോന്നി കൺട്രോൾ റും",     phone: "0468 2240087",  icon: "person", color: "blue"   }
+];
+
+const EMERGENCY_FOREST = [
+  { name: "Forest Division Control Room — Ranni", nameML: "ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും — റാന്നി", phone: "9188407515", icon: "group", color: "green" },
+  { name: "Forest Division Control Room — Konni", nameML: "ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും — കോന്നി", phone: "9188407513", icon: "group", color: "green" }
+];
+
+/* =========================================================
    i18n — English / Malayalam
    ========================================================= */
 const I18N = {
@@ -202,6 +241,13 @@ const I18N = {
     "helpdesk.ward1": "Ward 1 Member",
     "helpdesk.ward2": "Ward 2 Member",
     "helpdesk.ward3": "Ward 3 Member",
+
+    "emergency.eyebrow": "In Case of Emergency",
+    "emergency.title": "Emergency Contacts",
+    "emergency.sub": "District, Taluk, and Forest Division control room numbers for Pathanamthitta.",
+    "emergency.deocTitle": "Collectorate Control Room (DEOC)",
+    "emergency.teocHeading": "Taluk Control Rooms (TEOC)",
+    "emergency.forestHeading": "Forest Division Control Room",
 
     "weatherAlert.level.red": "Red Alert",
     "weatherAlert.level.orange": "Orange Alert",
@@ -293,6 +339,13 @@ const I18N = {
     "helpdesk.ward2": "വാർഡ് 2 മെമ്പർ",
     "helpdesk.ward3": "വാർഡ് 3 മെമ്പർ",
 
+    "emergency.eyebrow": "അടിയന്തര ഘട്ടങ്ങളിൽ",
+    "emergency.title": "അടിയന്തര നമ്പറുകൾ",
+    "emergency.sub": "പത്തനംതിട്ട ജില്ലയിലെ ജില്ലാ, താലൂക്ക്, ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും നമ്പറുകൾ.",
+    "emergency.deocTitle": "കളക്ടറേറ്റ് കൺട്രോൾ റും (DEOC)",
+    "emergency.teocHeading": "താലൂക്ക് കൺട്രോൾ റും (TEOC)",
+    "emergency.forestHeading": "ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും",
+
     "weatherAlert.level.red": "റെഡ് അലേർട്ട്",
     "weatherAlert.level.orange": "ഓറഞ്ച് അലേർട്ട്",
     "weatherAlert.level.yellow": "യെല്ലോ അലേർട്ട്",
@@ -334,6 +387,7 @@ function applyTranslations(){
   renderGallery();
   renderCarousel();
   renderHelpDesk();
+  renderEmergencyContacts();
   renderWeatherAlert();
 }
 
@@ -1059,6 +1113,72 @@ function renderHelpDesk(){
   if (wardGrid) wardGrid.innerHTML = HELP_DESK_WARD_MEMBERS.map(helpDeskItemHTML).join("");
 }
 
+/* ---------------------------------------------------------
+   Emergency Contacts — rendering.
+   Static data (EMERGENCY_DEOC / EMERGENCY_TEOC /
+   EMERGENCY_FOREST above), not from the Sheet. TEOC and
+   Forest rows reuse the same .helpdesk-item card markup as
+   the Help Desk section above (so both look consistent);
+   the DEOC district number gets its own red banner with one
+   tap-to-call chip per number, since it can list more than
+   a single phone number (landline, toll-free, mobile).
+   --------------------------------------------------------- */
+
+// Builds a tel: href from a raw phone string, handling landlines
+// (STD code, e.g. "0468 2222221"), toll-free numbers (e.g. "1077"),
+// and mobile numbers (10-digit, or already prefixed with +91).
+function toTelHref(phone){
+  const trimmed = phone.trim();
+  const digits = trimmed.replace(/[^\d+]/g, "");
+  if (trimmed.startsWith("+")) return `tel:${digits}`;
+  if (digits.length === 10) return `tel:+91${digits}`;
+  return `tel:${digits}`;
+}
+
+function emergencyDeocItemHTML(contact){
+  const name = escapeHTML(t(contact.key));
+  const digits = contact.phone.replace(/\D/g, "");
+  return `
+    <a class="helpdesk-item helpdesk-${contact.color}" href="tel:+91${digits}">
+      <span class="helpdesk-icon">${helpDeskIconFor(contact.icon)}</span>
+      <span class="helpdesk-name">${name}</span>
+      <span class="helpdesk-phone">${helpDeskPhoneIconSVG()}${formatHelpDeskPhone(contact.phone)}</span>
+    </a>`;
+}
+
+// TEOC/Forest rows have inline name/phone (not an i18n `key` like
+// Help Desk), with a separate Malayalam string in `nameML`.
+function emergencyRowHTML(row){
+  const lang = getCurrentLang();
+  const name = escapeHTML(lang === "ml" && row.nameML ? row.nameML : row.name);
+  return `
+    <a class="helpdesk-item helpdesk-${row.color}" href="${toTelHref(row.phone)}">
+      <span class="helpdesk-icon">${helpDeskIconFor(row.icon)}</span>
+      <span class="helpdesk-name">${name}</span>
+      <span class="helpdesk-phone">${helpDeskPhoneIconSVG()}${escapeHTML(row.phone)}</span>
+    </a>`;
+}
+
+function emergencyDeocHTML(){
+  const lang = getCurrentLang();
+  const title = escapeHTML(t("emergency.deocTitle"));
+  const numbersHTML = EMERGENCY_DEOC.numbers.map(num => `
+    <a href="${toTelHref(num)}">${helpDeskPhoneIconSVG()}${escapeHTML(num)}</a>
+  `).join("");
+  return `
+    <p class="emergency-deoc-title">${title}</p>
+    <div class="emergency-deoc-numbers">${numbersHTML}</div>`;
+}
+
+function renderEmergencyContacts(){
+  const deocEl = document.getElementById("emergencyDeoc");
+  const teocGrid = document.getElementById("emergencyTeocGrid");
+  const forestGrid = document.getElementById("emergencyForestGrid");
+  if (deocEl) deocEl.innerHTML = emergencyDeocHTML();
+  if (teocGrid) teocGrid.innerHTML = EMERGENCY_TEOC.map(emergencyRowHTML).join("");
+  if (forestGrid) forestGrid.innerHTML = EMERGENCY_FOREST.map(emergencyRowHTML).join("");
+}
+
 /* =========================================================
    TAB NAVIGATION
    ========================================================= */
@@ -1160,6 +1280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderAchievements();
   renderGallery();
   renderHelpDesk();
+  renderEmergencyContacts();
   renderWeatherAlert();
   initCarousel();
   initComplaintForm();
