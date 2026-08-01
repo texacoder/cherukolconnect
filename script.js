@@ -63,7 +63,7 @@ const SHEET_CSV = {
   news:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=0&single=true&output=csv",
   updates:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2101454905&single=true&output=csv",
   achievements: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=735728458&single=true&output=csv",
-  weatherAlert: "PASTE_YOUR_PUBLISHED_ID_HERE" // TODO: add a "WeatherAlert" tab to the Sheet, publish it to web as CSV, and paste its link here
+  weatherAlert: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2024229532&single=true&output=csv" // TODO: add a "WeatherAlert" tab to the Sheet, publish it to web as CSV, and paste its link here
 };
 
 // How often (in ms) to re-fetch the Sheet while the site is open,
