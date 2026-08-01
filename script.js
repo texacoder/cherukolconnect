@@ -17,17 +17,23 @@ const ARCHIVE_LIFETIME_DAYS = 30;
 // "Latest from your Panchayath" grid on the home page.
 const LATEST_DISPLAY_COUNT = 7;
 
+// District the home page's live rain/weather alert banner watches.
+// A row in the WeatherAlert sheet tab only triggers the banner when
+// its "district" column contains this text (case-insensitive).
+const WEATHER_ALERT_DISTRICT = "Pathanamthitta";
+
 /* =========================================================
    CONTENT SOURCE — Google Sheets
    =========================================================
-   The client edits three tabs in one Google Sheet (News,
-   Updates, Achievements). Each tab is published to the web as
-   CSV and fetched here on every page load, so every visitor
-   sees the same content — no login, no admin panel, no code.
+   The client edits four tabs in one Google Sheet (News,
+   Updates, Achievements, WeatherAlert). Each tab is published
+   to the web as CSV and fetched here on every page load, so
+   every visitor sees the same content — no login, no admin
+   panel, no code.
 
    SETUP (do this once):
-   1. Create a Google Sheet with three tabs named exactly:
-      News | Updates | Achievements
+   1. Create a Google Sheet with tabs named exactly:
+      News | Updates | Achievements | WeatherAlert
       (see README-FOR-CLIENT.md for the exact column headers
       each tab needs, and a template link.)
    2. File -> Share -> Publish to web -> choose each individual
@@ -35,17 +41,36 @@ const LATEST_DISPLAY_COUNT = 7;
    3. Copy the CSV link Google gives you for each tab and paste
       it below, replacing the placeholder URLs.
    4. That's it. The client only ever touches the Sheet again.
+
+   WeatherAlert tab columns:
+     district, level, headline_en, headline_ml, detail_en,
+     detail_ml, updated
+   - district: e.g. "Pathanamthitta" (only rows matching
+     WEATHER_ALERT_DISTRICT above are ever shown).
+   - level: red | orange | yellow (anything else, or a blank
+     row, means no alert is shown for that district).
+   - headline/detail: optional; if left blank the banner falls
+     back to a generic "<Level> issued for <district> district"
+     line built from the i18n strings below.
+   - updated: free text, e.g. "1 Aug, 9:40 AM" — shown as-is so
+     visitors can see how fresh the alert is.
+   To raise, change, or clear the alert, the client just edits
+   that one row in the Sheet — the home page picks it up
+   automatically on its next refresh (every SHEET_REFRESH_MS,
+   currently 5 minutes), no redeploy needed.
    ========================================================= */
 const SHEET_CSV = {
   news:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=0&single=true&output=csv",
   updates:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2101454905&single=true&output=csv",
-  achievements: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=735728458&single=true&output=csv"
+  achievements: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=735728458&single=true&output=csv",
+  weatherAlert: "PASTE_YOUR_PUBLISHED_ID_HERE" // TODO: add a "WeatherAlert" tab to the Sheet, publish it to web as CSV, and paste its link here
 };
 
 // How often (in ms) to re-fetch the Sheet while the site is open,
 // so a change the client makes shows up for visitors already
 // browsing without them needing to refresh. 5 minutes is a
 // reasonable balance between freshness and not hammering Google.
+// This is also how often the live weather-alert banner re-checks.
 const SHEET_REFRESH_MS = 5 * 60 * 1000;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -72,6 +97,29 @@ const GALLERY_CAPTIONS_ML = {
   "img.jpg": "ക്ഷേത്ര മൈതാനം",
   "img.jpg": "സർക്കാർ സ്കൂൾ"
 };
+
+/* =========================================================
+   HELP DESK — quick-dial contacts shown on the home page.
+   Not sourced from the Sheet; edit these arrays directly to
+   change names/numbers. `key` points at an i18n string below
+   so each entry has an English + Malayalam label out of the
+   box; `phone` is a plain 10-digit number (no spaces/+91).
+   `icon` picks the badge glyph, `color` picks the badge/accent
+   colour (see the .helpdesk-* classes in styles.css).
+   ========================================================= */
+const HELP_DESK_CONTACTS = [
+  { key: "helpdesk.president",          phone: "9747787996", icon: "person",    color: "green"  },
+  { key: "helpdesk.vicePresident",      phone: "9447421293", icon: "person",    color: "orange" },
+  { key: "helpdesk.secretary",          phone: "9495301223", icon: "pen",       color: "blue"   },
+  { key: "helpdesk.assistantSecretary", phone: "9539123495", icon: "person",    color: "purple" },
+  { key: "helpdesk.seniorClerk",        phone: "9495383970", icon: "clipboard", color: "brown"  }
+];
+
+const HELP_DESK_WARD_MEMBERS = [
+  { key: "helpdesk.ward1", phone: "9447116372", icon: "group", color: "green" },
+  { key: "helpdesk.ward2", phone: "8590648211", icon: "group", color: "pink"  },
+  { key: "helpdesk.ward3", phone: "9847296107", icon: "group", color: "blue"  }
+];
 
 /* =========================================================
    i18n — English / Malayalam
@@ -146,7 +194,26 @@ const I18N = {
     "card.daysAgoN": "{n} days ago",
     "carousel.goTo": "Go to slide",
     "card.readMore": "Read more",
-    "card.close": "Close"
+    "card.close": "Close",
+
+    "helpdesk.eyebrow": "Quick Contacts",
+    "helpdesk.title": "Help Desk",
+    "helpdesk.sub": "Reach out directly to Panchayath officials and ward members — tap a card to call.",
+    "helpdesk.wardHeading": "Ward Members",
+    "helpdesk.president": "President",
+    "helpdesk.vicePresident": "Vice President",
+    "helpdesk.secretary": "Secretary",
+    "helpdesk.assistantSecretary": "Assistant Secretary",
+    "helpdesk.seniorClerk": "Senior Clerk",
+    "helpdesk.ward1": "Ward 1 Member",
+    "helpdesk.ward2": "Ward 2 Member",
+    "helpdesk.ward3": "Ward 3 Member",
+
+    "weatherAlert.level.red": "Red Alert",
+    "weatherAlert.level.orange": "Orange Alert",
+    "weatherAlert.level.yellow": "Yellow Alert",
+    "weatherAlert.defaultHeadline": "{level} issued for Pathanamthitta district",
+    "weatherAlert.updated": "Updated:"
   },
   ml: {
     "nav.home": "ഹോം",
@@ -217,7 +284,26 @@ const I18N = {
     "card.daysAgoN": "{n} ദിവസം മുമ്പ്",
     "carousel.goTo": "സ്ലൈഡിലേക്ക് പോകുക",
     "card.readMore": "കൂടുതൽ വായിക്കുക",
-    "card.close": "അടയ്ക്കുക"
+    "card.close": "അടയ്ക്കുക",
+
+    "helpdesk.eyebrow": "പെട്ടെന്നുള്ള ബന്ധപ്പെടൽ",
+    "helpdesk.title": "ഹെൽപ്പ് ഡെസ്ക്",
+    "helpdesk.sub": "പഞ്ചായത്ത് ഉദ്യോഗസ്ഥരുമായും വാർഡ് അംഗങ്ങളുമായും നേരിട്ട് ബന്ധപ്പെടുക — വിളിക്കാൻ കാർഡിൽ ടാപ്പ് ചെയ്യുക.",
+    "helpdesk.wardHeading": "വാർഡ് അംഗങ്ങൾ",
+    "helpdesk.president": "പ്രസിഡന്റ്",
+    "helpdesk.vicePresident": "വൈസ് പ്രസിഡന്റ്",
+    "helpdesk.secretary": "സെക്രട്ടറി",
+    "helpdesk.assistantSecretary": "അസിസ്റ്റന്റ് സെക്രട്ടറി",
+    "helpdesk.seniorClerk": "സീനിയർ ക്ലാർക്ക്",
+    "helpdesk.ward1": "വാർഡ് 1 മെമ്പർ",
+    "helpdesk.ward2": "വാർഡ് 2 മെമ്പർ",
+    "helpdesk.ward3": "വാർഡ് 3 മെമ്പർ",
+
+    "weatherAlert.level.red": "റെഡ് അലേർട്ട്",
+    "weatherAlert.level.orange": "ഓറഞ്ച് അലേർട്ട്",
+    "weatherAlert.level.yellow": "യെല്ലോ അലേർട്ട്",
+    "weatherAlert.defaultHeadline": "പത്തനംതിട്ട ജില്ലയിൽ {level} പ്രഖ്യാപിച്ചു",
+    "weatherAlert.updated": "പുതുക്കിയത്:"
   }
 };
 
@@ -253,6 +339,8 @@ function applyTranslations(){
   renderAchievements();
   renderGallery();
   renderCarousel();
+  renderHelpDesk();
+  renderWeatherAlert();
 }
 
 function setLanguage(lang){
@@ -398,6 +486,26 @@ function rowToAchievementItem(row, i){
   };
 }
 
+// Valid alert levels, most severe first. Anything else in the
+// Sheet's "level" column (blank, "green", "none", a typo, ...)
+// is treated as "no active alert" for that row.
+const WEATHER_ALERT_LEVELS = ["red", "orange", "yellow"];
+
+function rowToWeatherAlertItem(row, i){
+  return {
+    id: row.id || ("sheet-w" + i),
+    district: row.district || "",
+    level: (row.level || "").trim().toLowerCase(),
+    headline: row.headline_en || row.headline || "",
+    detail: row.detail_en || row.detail || "",
+    updated: row.updated || "",
+    _ml: {
+      headline: row.headline_ml || "",
+      detail: row.detail_ml || ""
+    }
+  };
+}
+
 // In-memory caches. Populated entirely from the Google Sheet on
 // load (and every SHEET_REFRESH_MS after). They start empty and
 // stay empty until the Sheet is configured and reachable — the
@@ -405,6 +513,7 @@ function rowToAchievementItem(row, i){
 let newsCache = [];
 let updatesCache = [];
 let achievementsCache = [];
+let weatherAlertCache = [];
 
 // Tracks which news card is currently expanded (blog-style
 // read-more), keyed by item id, so it survives re-renders
@@ -425,16 +534,22 @@ async function loadAchievementsFromSheet(){
   const rows = await fetchSheet(SHEET_CSV.achievements);
   if (rows) achievementsCache = rows.map(rowToAchievementItem).filter(i => i.title);
 }
+async function loadWeatherAlertFromSheet(){
+  const rows = await fetchSheet(SHEET_CSV.weatherAlert);
+  if (rows) weatherAlertCache = rows.map(rowToWeatherAlertItem).filter(i => i.district);
+}
 
 async function refreshAllFromSheet(){
   await Promise.all([
     loadNewsFromSheet(),
     loadUpdatesFromSheet(),
-    loadAchievementsFromSheet()
+    loadAchievementsFromSheet(),
+    loadWeatherAlertFromSheet()
   ]);
   renderAllNews();
   renderUpdates();
   renderAchievements();
+  renderWeatherAlert();
 }
 
 /* ---------------------------------------------------------
@@ -839,6 +954,117 @@ function renderAchievements(){
   document.getElementById("achievementsEmptyState").hidden = achievementsCache.length > 0;
 }
 
+/* ---------------------------------------------------------
+   LIVE RAIN / WEATHER ALERT — home page banner.
+   Reads from weatherAlertCache (the WeatherAlert Sheet tab),
+   keeps only rows whose district matches WEATHER_ALERT_DISTRICT
+   and whose level is one of WEATHER_ALERT_LEVELS, and shows the
+   most severe match. Hides itself entirely when there's nothing
+   active. Called on initial render, on every Sheet refresh
+   (SHEET_REFRESH_MS), and on language switch — so it behaves
+   like a live, auto-updating alert without a page reload.
+   --------------------------------------------------------- */
+function renderWeatherAlert(){
+  const banner = document.getElementById("weatherAlertBanner");
+  if (!banner) return;
+
+  const match = weatherAlertCache
+    .filter(a => a.district.toLowerCase().includes(WEATHER_ALERT_DISTRICT.toLowerCase()))
+    .filter(a => WEATHER_ALERT_LEVELS.includes(a.level))
+    .sort((a, b) => WEATHER_ALERT_LEVELS.indexOf(a.level) - WEATHER_ALERT_LEVELS.indexOf(b.level))[0];
+
+  if (!match){
+    banner.hidden = true;
+    banner.className = "weather-alert-banner";
+    return;
+  }
+
+  const item = localize(match);
+  const levelLabel = t("weatherAlert.level." + match.level);
+  const defaultHeadline = t("weatherAlert.defaultHeadline").replace("{level}", levelLabel);
+
+  banner.hidden = false;
+  banner.className = `weather-alert-banner level-${match.level}`;
+  document.getElementById("weatherAlertHeadline").textContent = item.headline || defaultHeadline;
+  document.getElementById("weatherAlertDetail").textContent = item.detail || "";
+  document.getElementById("weatherAlertUpdated").textContent =
+    match.updated ? `${t("weatherAlert.updated")} ${match.updated}` : "";
+}
+
+/* ---------------------------------------------------------
+   Help Desk — quick-dial contact cards (rendering)
+   Static data (HELP_DESK_CONTACTS / HELP_DESK_WARD_MEMBERS
+   above), not from the Sheet. Icons are picked per-entry via
+   the `icon` field; colours via the `color` field, matching
+   the .helpdesk-* classes in styles.css.
+   --------------------------------------------------------- */
+function helpDeskPersonIconSVG(){
+  return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="12" cy="8" r="4"/>
+    <path d="M4 21c0-4 3.8-6.5 8-6.5s8 2.5 8 6.5"/>
+  </svg>`;
+}
+function helpDeskPenIconSVG(){
+  return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M12 20h9"/>
+    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+  </svg>`;
+}
+function helpDeskClipboardIconSVG(){
+  return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <rect x="6" y="4" width="12" height="17" rx="2"/>
+    <path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/>
+    <path d="M9 11h6M9 15h6"/>
+  </svg>`;
+}
+function helpDeskGroupIconSVG(){
+  return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="9" cy="8" r="3"/>
+    <path d="M2 20c0-3.3 3.1-5 7-5s7 1.7 7 5"/>
+    <circle cx="17.5" cy="9" r="2.3"/>
+    <path d="M15.6 13.1c2.7.4 4.9 1.9 4.9 4"/>
+  </svg>`;
+}
+function helpDeskPhoneIconSVG(){
+  return `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.6a16 16 0 0 0 6 6l1.1-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/>
+  </svg>`;
+}
+
+function helpDeskIconFor(type){
+  switch(type){
+    case "pen": return helpDeskPenIconSVG();
+    case "clipboard": return helpDeskClipboardIconSVG();
+    case "group": return helpDeskGroupIconSVG();
+    default: return helpDeskPersonIconSVG();
+  }
+}
+
+// Displays a 10-digit number as "XXXXX XXXXX" for readability.
+function formatHelpDeskPhone(phone){
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length !== 10) return phone;
+  return digits.slice(0, 5) + " " + digits.slice(5);
+}
+
+function helpDeskItemHTML(contact){
+  const name = escapeHTML(t(contact.key));
+  const digits = contact.phone.replace(/\D/g, "");
+  return `
+    <a class="helpdesk-item helpdesk-${contact.color}" href="tel:+91${digits}">
+      <span class="helpdesk-icon">${helpDeskIconFor(contact.icon)}</span>
+      <span class="helpdesk-name">${name}</span>
+      <span class="helpdesk-phone">${helpDeskPhoneIconSVG()}${formatHelpDeskPhone(contact.phone)}</span>
+    </a>`;
+}
+
+function renderHelpDesk(){
+  const grid = document.getElementById("helpDeskGrid");
+  const wardGrid = document.getElementById("helpDeskWardGrid");
+  if (grid) grid.innerHTML = HELP_DESK_CONTACTS.map(helpDeskItemHTML).join("");
+  if (wardGrid) wardGrid.innerHTML = HELP_DESK_WARD_MEMBERS.map(helpDeskItemHTML).join("");
+}
+
 /* =========================================================
    TAB NAVIGATION
    ========================================================= */
@@ -939,6 +1165,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderUpdates();
   renderAchievements();
   renderGallery();
+  renderHelpDesk();
+  renderWeatherAlert();
   initCarousel();
   initComplaintForm();
   initContactForm();
@@ -953,5 +1181,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Keep content fresh for anyone who leaves a tab open, and
   // re-check the two-day/one-week aging windows periodically.
+  // This is also what makes the weather-alert banner "live" —
+  // it re-checks the WeatherAlert sheet on the same cycle.
   setInterval(refreshAllFromSheet, SHEET_REFRESH_MS);
 });
