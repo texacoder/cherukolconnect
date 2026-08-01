@@ -3,15 +3,15 @@
    ========================================================= */
 // WhatsApp number that complaints are sent to, in international
 // format with no + or spaces (country code + number).
-const WHATSAPP_NUMBER = "918078460042"; // TODO: replace with the real office WhatsApp number
+const WHATSAPP_NUMBER = "919747787996"; // TODO: replace with the real office WhatsApp number
 
 // Email address the contact form composes a message to.
-const CONTACT_EMAIL = "jishnur401@gmail.com"; // TODO: replace with real email
+const CONTACT_EMAIL = "cherukolegp@gmail.com"; // TODO: replace with real email
 
 // A story counts as "latest" for this many days, then moves to Old News.
-const LATEST_WINDOW_DAYS = 5;
+const LATEST_WINDOW_DAYS = 7;
 // A story is removed completely this many days after it was published.
-const ARCHIVE_LIFETIME_DAYS = 20;
+const ARCHIVE_LIFETIME_DAYS = 30;
 
 // How many of the freshest stories to show in the scrollable
 // "Latest from your Panchayath" grid on the home page.
