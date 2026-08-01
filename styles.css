@@ -70,6 +70,16 @@ html[lang="ml"] h1, html[lang="ml"] h2, html[lang="ml"] h3{
   font-weight: 700;
 }
 
+/* The "CherukolConnect" wordmark stays in Latin script even when
+   the site is switched to Malayalam, so it should keep the same
+   brand font used in the English view (Cinzel/Rozha One) instead
+   of falling back to Noto Sans Malayalam, which renders Latin
+   letters in an unattractive, mismatched style. */
+html[lang="ml"] .brand-text h1{
+  font-family: var(--font-brand);
+  font-weight: 700;
+}
+
 h1,h2,h3{
   font-family: var(--font-display);
   font-weight: 400;
@@ -103,22 +113,32 @@ button{ font-family: inherit; cursor:pointer; }
 
 /* =========================================================
    HEADER
+   Full-width bar with a richer, deeper surface: a two-tone
+   forest gradient (a touch of near-black at the edges keeps it
+   from reading flat), a soft gold glow behind the emblem, and a
+   fine gold hairline along the bottom edge that separates it
+   from the kasavu border below instead of the two effects
+   competing. Content is capped and centered like the rest of
+   the page (main also caps at 1100px) so brand + nav line up
+   with everything under it.
    ========================================================= */
 .site-header{
   background:
-    radial-gradient(520px 140px at 14% 0%, rgba(233,206,109,.10), transparent 65%),
-    linear-gradient(160deg, #0d3f2a 0%, var(--forest-dark) 55%, #082a1c 100%);
+    radial-gradient(480px 160px at 10% -10%, rgba(233,206,109,.14), transparent 60%),
+    radial-gradient(600px 200px at 100% 0%, rgba(15,76,51,.5), transparent 65%),
+    linear-gradient(155deg, #0f4a30 0%, var(--forest-dark) 48%, #071f15 100%);
   color: var(--white);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 6px 22px rgba(4,26,17,.28);
+  box-shadow: 0 8px 24px rgba(3,20,13,.32);
+  border-bottom: 1px solid rgba(233,206,109,.35);
 }
 
 .header-inner{
   max-width: 1100px;
   margin: 0 auto;
-  padding: 16px 20px 13px;
+  padding: 16px 20px 14px;
   position: relative;
 }
 
@@ -127,7 +147,7 @@ button{ font-family: inherit; cursor:pointer; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
 }
 
 .brand{
@@ -149,8 +169,9 @@ button{ font-family: inherit; cursor:pointer; }
   overflow: hidden;
   box-shadow:
     0 0 0 2px var(--forest-dark),
-    0 0 0 3.5px var(--gold-light),
-    0 3px 10px rgba(0,0,0,.35);
+    0 0 0 4px var(--gold-light),
+    0 4px 12px rgba(0,0,0,.4),
+    0 0 0 7px rgba(233,206,109,.08);
   transition: box-shadow .2s ease, transform .2s ease;
 }
 .brand-emblem img{
@@ -162,34 +183,36 @@ button{ font-family: inherit; cursor:pointer; }
 .brand:hover .brand-emblem{
   box-shadow:
     0 0 0 2px var(--forest-dark),
-    0 0 0 3.5px var(--gold-light),
-    0 0 14px rgba(233,206,109,.55);
-  transform: scale(1.03);
+    0 0 0 4px var(--gold-light),
+    0 0 16px rgba(233,206,109,.6),
+    0 0 0 7px rgba(233,206,109,.14);
+  transform: scale(1.04);
 }
 
 .brand-text h1{
   font-family: var(--font-brand);
-  font-size: 1.4rem;
+  font-size: 1.42rem;
   font-weight: 700;
   color: var(--white);
   margin:0;
   line-height: 1.15;
-  letter-spacing: .03em;
-  text-shadow: 0 1px 3px rgba(0,0,0,.3);
+  letter-spacing: .035em;
+  text-shadow: 0 2px 6px rgba(0,0,0,.35);
 }
 .brand-text h1 span{ color: var(--gold-light); }
 
 /* Fine gold rule under the wordmark — a quiet echo of the
    kasavu border, gives the brand block a bit more presence. */
 .brand-text{
-  padding-bottom: 2px;
-  border-bottom: 1px solid rgba(233,206,109,.28);
+  padding-bottom: 3px;
+  border-bottom: 1px solid rgba(233,206,109,.32);
 }
 
-/* Cinzel (English brand font) renders visually larger than Noto
-   Sans Malayalam at the same font-size, so trim it slightly when
-   English is active to keep both languages looking balanced. */
-html[lang="en"] .brand-text h1{ font-size: 1.28rem; }
+/* Cinzel renders visually larger than Noto Sans Malayalam at the
+   same font-size, so trim it slightly. Applied in both languages
+   now, since the wordmark always uses Cinzel (see rule above). */
+html[lang="en"] .brand-text h1,
+html[lang="ml"] .brand-text h1{ font-size: 1.3rem; }
 
 /* ---------------------------------------------------------
    Header actions — wraps the new language toggle + the
@@ -205,11 +228,11 @@ html[lang="en"] .brand-text h1{ font-size: 1.28rem; }
 .lang-toggle{
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(233,206,109,.45);
+  gap: 7px;
+  background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
+  border: 1px solid rgba(233,206,109,.5);
   color: var(--white);
-  padding: 7px 13px;
+  padding: 7px 14px;
   border-radius: 999px;
   font-size: .82rem;
   font-weight: 700;
@@ -219,10 +242,10 @@ html[lang="en"] .brand-text h1{ font-size: 1.28rem; }
 }
 .lang-toggle svg{ color: var(--gold-light); flex-shrink: 0; }
 .lang-toggle:hover{
-  background: rgba(233,206,109,.16);
+  background: linear-gradient(135deg, rgba(233,206,109,.22), rgba(233,206,109,.1));
   border-color: var(--gold-light);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,.22);
+  box-shadow: 0 5px 14px rgba(0,0,0,.25);
 }
 
 .nav-toggle{
@@ -231,21 +254,21 @@ html[lang="en"] .brand-text h1{ font-size: 1.28rem; }
   justify-content: center;
   align-items: flex-end;
   gap:5px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(233,206,109,.3);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(233,206,109,.35);
   border-radius: 10px;
   padding: 9px 10px;
   transition: background .18s ease, border-color .18s ease;
 }
 .nav-toggle:hover{
-  background: rgba(233,206,109,.14);
-  border-color: rgba(233,206,109,.55);
+  background: rgba(233,206,109,.16);
+  border-color: rgba(233,206,109,.6);
 }
 .nav-toggle span{
   height: 2px; background: var(--gold-light); display:block; border-radius: 2px;
 }
 .nav-toggle span:nth-child(1){ width: 22px; }
-.nav-toggle span:nth-child(2){ width: 16px; }
+.nav-toggle span:nth-child(2){ width: 15px; }
 .nav-toggle span:nth-child(3){ width: 22px; }
 
 .site-nav{
@@ -253,7 +276,7 @@ html[lang="en"] .brand-text h1{ font-size: 1.28rem; }
   padding: 14px 0 2px;
   flex-direction: column;
   gap: 6px;
-  border-top: 1px solid rgba(233,206,109,.18);
+  border-top: 1px solid rgba(233,206,109,.22);
   margin-top: 12px;
 }
 .site-nav.open{ display:flex; animation: fadeIn .2s ease; }
@@ -262,10 +285,10 @@ html[lang="en"] .brand-text h1{ font-size: 1.28rem; }
   background: none;
   border: 1px solid transparent;
   color: var(--white);
-  opacity: .82;
+  opacity: .85;
   padding: 9px 14px;
   border-radius: 999px;
-  font-size: .92rem;
+  font-size: .9rem;
   font-weight: 600;
   letter-spacing: .01em;
   transition: all .15s ease;
@@ -971,12 +994,14 @@ main{
 }
 
 @media (max-width: 480px){
-  .header-top{ padding: 12px 14px; gap: 8px; }
+  .header-inner{ padding: 12px 14px; }
+  .header-top{ gap: 8px; }
   .brand{ gap: 7px; }
   .brand-emblem{ width: 32px; height: 32px; }
   .brand-text h1{ font-size: .88rem; letter-spacing: .01em; }
-  html[lang="en"] .brand-text h1{ font-size: .78rem; }
-  .site-nav{ padding: 0 16px 10px; }
+  html[lang="en"] .brand-text h1,
+  html[lang="ml"] .brand-text h1{ font-size: .78rem; }
+  .site-nav{ padding: 0 0 10px; }
   .nav-link{ padding: 8px 12px; font-size: .88rem; }
 
   .header-actions{ gap: 5px; }
@@ -1023,7 +1048,8 @@ main{
 
 @media (max-width: 360px){
   .brand-text h1{ font-size: .78rem; }
-  html[lang="en"] .brand-text h1{ font-size: .68rem; }
+  html[lang="en"] .brand-text h1,
+  html[lang="ml"] .brand-text h1{ font-size: .68rem; }
   .lang-toggle{ padding: 5px; }
   .lang-toggle #langToggleLabel{ display: none; }
 }
