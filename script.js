@@ -4,7 +4,7 @@
 // WhatsApp number that complaints are sent to, in international
 // format with no + or spaces (country code + number).
 const WHATSAPP_NUMBER = "919747787996"; // TODO: replace with the real office WhatsApp number
- 
+
 // Email address the contact form composes a message to.
 const CONTACT_EMAIL = "cherukolegp@gmail.com"; // TODO: replace with real email
 
@@ -103,7 +103,10 @@ const GALLERY_IMAGES = [
   { src: "rain3.jpg",  caption: "" },
   { src: "rain4.jpg",  caption: "" },
   { src: "rain5.jpg",  caption: "" },
-  { src: "rain5.jpg",  caption: "" }
+  { src: "p1.jpg",  caption: "" },
+  { src: "p2.jpg",  caption: "" },
+  { src: "p3.jpg",  caption: "" },
+  { src: "p4.jpg",  caption: "" }
 ];
 
 const GALLERY_CAPTIONS_ML = {
@@ -1343,4 +1346,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   // it re-checks the WeatherAlert sheet on the same cycle.
   setInterval(refreshAllFromSheet, SHEET_REFRESH_MS);
 });
-
