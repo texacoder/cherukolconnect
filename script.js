@@ -25,15 +25,15 @@ const WEATHER_ALERT_DISTRICT = "Pathanamthitta";
 /* =========================================================
    CONTENT SOURCE — Google Sheets
    =========================================================
-   The client edits four tabs in one Google Sheet (News,
-   Updates, Achievements, WeatherAlert). Each tab is published
-   to the web as CSV and fetched here on every page load, so
-   every visitor sees the same content — no login, no admin
-   panel, no code.
+   The client edits five tabs in one Google Sheet (News,
+   Updates, Achievements, WeatherAlert, HomeSlider). Each tab
+   is published to the web as CSV and fetched here on every
+   page load, so every visitor sees the same content — no
+   login, no admin panel, no code.
 
    SETUP (do this once):
    1. Create a Google Sheet with tabs named exactly:
-      News | Updates | Achievements | WeatherAlert
+      News | Updates | Achievements | WeatherAlert | HomeSlider
       (see README-FOR-CLIENT.md for the exact column headers
       each tab needs, and a template link.)
    2. File -> Share -> Publish to web -> choose each individual
@@ -58,12 +58,25 @@ const WEATHER_ALERT_DISTRICT = "Pathanamthitta";
    that one row in the Sheet — the home page picks it up
    automatically on its next refresh (every SHEET_REFRESH_MS,
    currently 5 minutes), no redeploy needed.
+
+   HomeSlider tab columns:
+     id, image, caption_en, caption_ml
+   - image: a public image URL (e.g. a Google Drive "anyone with
+     the link can view" image link, or any hosted image URL).
+   - caption_en / caption_ml: optional captions shown under the
+     slide.
+   This is the ONLY source for the home page's sliding image
+   carousel now — it no longer reuses the Gallery tab's photos
+   (GALLERY_IMAGES below), so the client can curate a short,
+   separate set of slides for the home page without it affecting
+   the full Photo Gallery page.
    ========================================================= */
 const SHEET_CSV = {
   news:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=0&single=true&output=csv",
   updates:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2101454905&single=true&output=csv",
   achievements: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=735728458&single=true&output=csv",
-  weatherAlert: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2024229532&single=true&output=csv" // TODO: add a "WeatherAlert" tab to the Sheet, publish it to web as CSV, and paste its link here
+  weatherAlert: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2024229532&single=true&output=csv", // TODO: add a "WeatherAlert" tab to the Sheet, publish it to web as CSV, and paste its link here
+  homeSlider:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=1904233165&single=true&output=csv" // TODO: add a "HomeSlider" tab to the Sheet, publish it to web as CSV, and paste its link here
 };
 
 // How often (in ms) to re-fetch the Sheet while the site is open,
@@ -76,16 +89,21 @@ const SHEET_REFRESH_MS = 5 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /* =========================================================
-   GALLERY — static images shown in the Gallery tab and the
-   home page carousel. Not sourced from the Sheet; edit this
-   array directly to change the photos on display.
+   GALLERY — static images shown in the Gallery tab (the full
+   Photo Gallery page only). Not sourced from the Sheet; edit
+   this array directly to change the photos on display there.
+   NOTE: these are no longer used for the home page carousel —
+   that now comes entirely from the HomeSlider Sheet tab above.
    ========================================================= */
 const GALLERY_IMAGES = [
   { src: "rain.jpg",  caption: "" },
   { src: "electricity.jpg",    caption: "" },
   { src: "rain1.jpg",  caption: "" },
   { src: "rain2.jpg",  caption: "" },
-  { src: "rain3.jpg",  caption: "" }
+  { src: "rain3.jpg",  caption: "" },
+  { src: "rain4.jpg",  caption: "" },
+  { src: "rain5.jpg",  caption: "" },
+  { src: "rain5.jpg",  caption: "" }
 ];
 
 const GALLERY_CAPTIONS_ML = {
@@ -556,6 +574,19 @@ function rowToWeatherAlertItem(row, i){
   };
 }
 
+// Home page slider — sourced from the "HomeSlider" Sheet tab.
+// Each row is one slide: an image URL plus an optional caption.
+function rowToHomeSliderItem(row, i){
+  return {
+    id: row.id || ("sheet-h" + i),
+    image: row.image || "",
+    caption: row.caption_en || row.caption || "",
+    _ml: {
+      caption: row.caption_ml || ""
+    }
+  };
+}
+
 // In-memory caches. Populated entirely from the Google Sheet on
 // load (and every SHEET_REFRESH_MS after). They start empty and
 // stay empty until the Sheet is configured and reachable — the
@@ -564,6 +595,7 @@ let newsCache = [];
 let updatesCache = [];
 let achievementsCache = [];
 let weatherAlertCache = [];
+let homeSliderCache = [];
 
 // Tracks which news card is currently expanded (blog-style
 // read-more), keyed by item id, so it survives re-renders
@@ -588,18 +620,24 @@ async function loadWeatherAlertFromSheet(){
   const rows = await fetchSheet(SHEET_CSV.weatherAlert);
   if (rows) weatherAlertCache = rows.map(rowToWeatherAlertItem).filter(i => i.district);
 }
+async function loadHomeSliderFromSheet(){
+  const rows = await fetchSheet(SHEET_CSV.homeSlider);
+  if (rows) homeSliderCache = rows.map(rowToHomeSliderItem).filter(i => i.image);
+}
 
 async function refreshAllFromSheet(){
   await Promise.all([
     loadNewsFromSheet(),
     loadUpdatesFromSheet(),
     loadAchievementsFromSheet(),
-    loadWeatherAlertFromSheet()
+    loadWeatherAlertFromSheet(),
+    loadHomeSliderFromSheet()
   ]);
   renderAllNews();
   renderUpdates();
   renderAchievements();
   renderWeatherAlert();
+  renderCarousel();
 }
 
 /* ---------------------------------------------------------
@@ -847,33 +885,35 @@ function renderGallery(){
 }
 
 /* =========================================================
-   HOME CAROUSEL — unchanged from original
+   HOME CAROUSEL
+   =========================================================
+   Now sourced entirely from homeSliderCache (the "HomeSlider"
+   Sheet tab), not from GALLERY_IMAGES — so the client controls
+   the home page slides independently from the full Photo
+   Gallery page by editing that one Sheet tab.
    ========================================================= */
 const CAROUSEL_INTERVAL_MS = 4500;
 let carouselIndex = 0;
 let carouselTimer = null;
-
-function carouselSlideCaption(img){
-  const lang = getCurrentLang();
-  return (lang === "ml" && GALLERY_CAPTIONS_ML[img.src]) ? GALLERY_CAPTIONS_ML[img.src] : img.caption;
-}
 
 function renderCarousel(){
   const track = document.getElementById("carouselTrack");
   const dotsWrap = document.getElementById("carouselDots");
   if (!track || !dotsWrap) return;
 
-  track.innerHTML = GALLERY_IMAGES.map(img => {
-    const caption = carouselSlideCaption(img);
+  const slides = homeSliderCache.map(localize);
+
+  track.innerHTML = slides.map(item => {
+    const caption = item.caption || "";
     return `
       <div class="carousel-slide">
-        <img src="${img.src}" alt="${escapeHTML(caption)}" loading="lazy"
+        <img src="${item.image}" alt="${escapeHTML(caption)}" loading="lazy"
              onerror="this.parentElement.innerHTML = placeholderSVG() + '<div class=\\'carousel-caption\\'>${escapeHTML(caption)}</div>';">
         <div class="carousel-caption">${escapeHTML(caption)}</div>
       </div>`;
   }).join("");
 
-  dotsWrap.innerHTML = GALLERY_IMAGES.map((img, i) => `
+  dotsWrap.innerHTML = slides.map((img, i) => `
     <button type="button" class="carousel-dot" role="tab" data-index="${i}"
       aria-label="${t("carousel.goTo")} ${i + 1}" aria-selected="${i === carouselIndex}"></button>
   `).join("");
@@ -884,7 +924,7 @@ function renderCarousel(){
 function updateCarouselPosition(){
   const track = document.getElementById("carouselTrack");
   if (!track) return;
-  const count = GALLERY_IMAGES.length;
+  const count = homeSliderCache.length;
   if (count === 0) return;
   if (carouselIndex < 0) carouselIndex = count - 1;
   if (carouselIndex >= count) carouselIndex = 0;
@@ -906,7 +946,7 @@ function carouselPrev(){ carouselGoTo(carouselIndex - 1); }
 
 function startCarouselAutoplay(){
   stopCarouselAutoplay();
-  if (GALLERY_IMAGES.length <= 1) return;
+  if (homeSliderCache.length <= 1) return;
   carouselTimer = setInterval(carouselNext, CAROUSEL_INTERVAL_MS);
 }
 
@@ -1295,6 +1335,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Pull real content from the Google Sheet (falls back silently
   // to an empty list if not configured yet or unreachable).
   await refreshAllFromSheet();
+  startCarouselAutoplay();
 
   // Keep content fresh for anyone who leaves a tab open, and
   // re-check the two-day/one-week aging windows periodically.
@@ -1302,3 +1343,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   // it re-checks the WeatherAlert sheet on the same cycle.
   setInterval(refreshAllFromSheet, SHEET_REFRESH_MS);
 });
+
