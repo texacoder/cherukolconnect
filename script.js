@@ -4,7 +4,7 @@
 // WhatsApp number that complaints are sent to, in international
 // format with no + or spaces (country code + number).
 const WHATSAPP_NUMBER = "919747787996"; // TODO: replace with the real office WhatsApp number
-
+ 
 // Email address the contact form composes a message to.
 const CONTACT_EMAIL = "cherukolegp@gmail.com"; // TODO: replace with real email
 
