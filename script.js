@@ -169,21 +169,21 @@ const I18N = {
 
     "home.eyebrow": "Updated daily",
     "home.title": "Latest from your Panchayath",
-    "home.sub": "News and announcements from the last seven days. Scroll the list below to see everything at a glance — older stories move to the Old News page and clear out a week after publishing.",
+    "home.sub": "News and announcements from the last seven days. Scroll the list below to see everything at a glance — older stories move to the Old News page and clear out 30 days after publishing.",
     "home.emptyPre": "No fresh updates right now — check back soon, or browse",
 
     "updates.eyebrow": "Notices & Circulars",
     "updates.title": "Important Updates",
-    "updates.sub": "Deadlines, office notices, and announcements that need your attention. This is placeholder content — replace it with real notices any time.",
+    "updates.sub": "Deadlines, office notices, and announcements that need your attention.",
     "updates.empty": "No important updates at the moment.",
 
     "achievements.eyebrow": "Milestones",
     "achievements.title": "Achievements",
-    "achievements.sub": "Projects completed and recognitions earned by the Panchayath. This is placeholder content — replace it with real achievements any time.",
+    "achievements.sub": "Projects completed and recognitions earned by the Panchayath. ",
     "achievements.empty": "No achievements listed yet.",
 
     "oldnews.eyebrow": "Archive",
-    "oldnews.sub": "Stories older than seven days live here for one week from their publish date, then they're cleared automatically.",
+    "oldnews.sub": "Stories older than seven days live here for 30days from their publish date, then they're cleared automatically.",
     "oldnews.empty": "Nothing in the archive at the moment.",
 
     "gallery.eyebrow": "Around the Panchayath",
@@ -266,21 +266,21 @@ const I18N = {
 
     "home.eyebrow": "ദിവസവും പുതുക്കുന്നു",
     "home.title": "നിങ്ങളുടെ പഞ്ചായത്തിൽ നിന്നുള്ള ഏറ്റവും പുതിയ വാർത്തകൾ",
-    "home.sub": "കഴിഞ്ഞ ഏഴ് ദിവസത്തെ വാർത്തകളും അറിയിപ്പുകളും. താഴെയുള്ള ലിസ്റ്റ് സ്ക്രോൾ ചെയ്ത് എല്ലാം ഒറ്റനോട്ടത്തിൽ കാണുക — പഴയ വാർത്തകൾ 'പഴയ വാർത്തകൾ' പേജിലേക്ക് മാറുകയും പ്രസിദ്ധീകരിച്ച് ഒരാഴ്ചയ്ക്ക് ശേഷം നീക്കം ചെയ്യപ്പെടുകയും ചെയ്യും.",
+    "home.sub": "കഴിഞ്ഞ ഏഴ് ദിവസത്തെ വാർത്തകളും അറിയിപ്പുകളും. താഴെയുള്ള ലിസ്റ്റ് സ്ക്രോൾ ചെയ്ത് എല്ലാം ഒറ്റനോട്ടത്തിൽ കാണുക — പഴയ വാർത്തകൾ 'പഴയ വാർത്തകൾ' പേജിലേക്ക് മാറുകയും പ്രസിദ്ധീകരിച്ച് 30 ദിവസ ശേഷം നീക്കം ചെയ്യപ്പെടുകയും ചെയ്യും.",
     "home.emptyPre": "ഇപ്പോൾ പുതിയ അപ്ഡേറ്റുകൾ ഇല്ല — ഉടൻ വീണ്ടും പരിശോധിക്കുക, അല്ലെങ്കിൽ കാണുക",
 
     "updates.eyebrow": "അറിയിപ്പുകളും സർക്കുലറുകളും",
     "updates.title": "പ്രധാന അറിയിപ്പുകൾ",
-    "updates.sub": "നിങ്ങളുടെ ശ്രദ്ധ ആവശ്യമുള്ള അവസാന തീയതികൾ, ഓഫീസ് അറിയിപ്പുകൾ, പ്രഖ്യാപനങ്ങൾ. ഇത് മാതൃകാ ഉള്ളടക്കമാണ് — എപ്പോൾ വേണമെങ്കിലും യഥാർത്ഥ അറിയിപ്പുകൾ ഉപയോഗിച്ച് മാറ്റിസ്ഥാപിക്കുക.",
+    "updates.sub": "നിങ്ങളുടെ ശ്രദ്ധ ആവശ്യമുള്ള അവസാന തീയതികൾ, ഓഫീസ് അറിയിപ്പുകൾ, പ്രഖ്യാപനങ്ങൾ.",
     "updates.empty": "ഇപ്പോൾ പ്രധാന അറിയിപ്പുകളൊന്നുമില്ല.",
 
     "achievements.eyebrow": "നാഴികക്കല്ലുകൾ",
     "achievements.title": "നേട്ടങ്ങൾ",
-    "achievements.sub": "പഞ്ചായത്ത് പൂർത്തിയാക്കിയ പദ്ധതികളും നേടിയ അംഗീകാരങ്ങളും. ഇത് മാതൃകാ ഉള്ളടക്കമാണ് — എപ്പോൾ വേണമെങ്കിലും യഥാർത്ഥ നേട്ടങ്ങൾ ഉപയോഗിച്ച് മാറ്റിസ്ഥാപിക്കുക.",
+    "achievements.sub": "പഞ്ചായത്ത് പൂർത്തിയാക്കിയ പദ്ധതികളും നേടിയ അംഗീകാരങ്ങളും.",
     "achievements.empty": "ഇതുവരെ നേട്ടങ്ങളൊന്നും പട്ടികപ്പെടുത്തിയിട്ടില്ല.",
 
     "oldnews.eyebrow": "ആർക്കൈവ്",
-    "oldnews.sub": "ഏഴ് ദിവസത്തിൽ കൂടുതൽ പഴക്കമുള്ള വാർത്തകൾ പ്രസിദ്ധീകരിച്ച തീയതി മുതൽ ഒരാഴ്ചത്തേക്ക് ഇവിടെ ലഭ്യമാണ്, അതിനുശേഷം അവ സ്വയമേവ നീക്കം ചെയ്യപ്പെടും.",
+    "oldnews.sub": "ഏഴ് ദിവസത്തിൽ കൂടുതൽ പഴക്കമുള്ള വാർത്തകൾ പ്രസിദ്ധീകരിച്ച തീയതി മുതൽ 30 ദിവസ  ഇവിടെ ലഭ്യമാണ്, അതിനുശേഷം അവ സ്വയമേവ നീക്കം ചെയ്യപ്പെടും.",
     "oldnews.empty": "ഇപ്പോൾ ആർക്കൈവിൽ ഒന്നുമില്ല.",
 
     "gallery.eyebrow": "പഞ്ചായത്തിന് ചുറ്റും",
