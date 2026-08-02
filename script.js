@@ -83,7 +83,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const GALLERY_IMAGES = [
   { src: "rain.jpg",  caption: "" },
   { src: "electricity.jpg",    caption: "" },
-  { src: "cherukolrain.jpg",  caption: "" }
+  { src: "rain1.jpg",  caption: "" },
+  { src: "rain2.jpg",  caption: "" },
+  { src: "rain3.jpg",  caption: "" }
 ];
 
 const GALLERY_CAPTIONS_ML = {
@@ -188,7 +190,7 @@ const I18N = {
 
     "gallery.eyebrow": "Around the Panchayath",
     "gallery.title": "Photo Gallery",
-    "gallery.sub": "A look at our offices, events, and public spaces.",
+    "gallery.sub": "Capturing cherukole panchayat's initiatives,emergency response,community events,and public services.",
 
     "complaint.eyebrow": "Grievance Redressal",
     "complaint.sub": "Fill in the details below. Submitting opens WhatsApp with your message pre-filled, ready to send to the Panchayath office.",
@@ -285,7 +287,7 @@ const I18N = {
 
     "gallery.eyebrow": "പഞ്ചായത്തിന് ചുറ്റും",
     "gallery.title": "ഫോട്ടോ ഗാലറി",
-    "gallery.sub": "ഞങ്ങളുടെ ഓഫീസുകൾ, പരിപാടികൾ, പൊതു ഇടങ്ങൾ എന്നിവയുടെ ഒരു കാഴ്ച.",
+    "gallery.sub": "ഞചെറുകോൾ പഞ്ചായത്തിന്റെ പദ്ധതികൾ, അടിയന്തര പ്രതികരണ പ്രവർത്തനങ്ങൾ, സമൂഹ പരിപാടികൾ, പൊതുസേവനങ്ങൾ എന്നിവ രേഖപ്പെടുത്തുന്നു.",
 
     "complaint.eyebrow": "പരാതി പരിഹാരം",
     "complaint.sub": "താഴെയുള്ള വിവരങ്ങൾ പൂരിപ്പിക്കുക. സമർപ്പിക്കുമ്പോൾ നിങ്ങളുടെ സന്ദേശം മുൻകൂട്ടി പൂരിപ്പിച്ച നിലയിൽ WhatsApp തുറക്കും, പഞ്ചായത്ത് ഓഫീസിലേക്ക് അയക്കാൻ തയ്യാർ.",
