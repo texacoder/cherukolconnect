@@ -565,31 +565,15 @@ main{
    All cards share one fixed-height template so every box in
    the grid is identical in size, no matter how long the
    title/summary text is (clamped with ellipsis). The grid
-   sits inside a scrollable panel so 5-7 stories are reachable
-   without pushing the rest of the page down.
+   flows naturally with the rest of the page — it is no longer
+   placed inside its own inner scroll panel; the whole page
+   scrolls together instead.
    ========================================================= */
 
 .latest-scroll{
-  max-height: 800px;
-  overflow-y: auto;
-  padding: 4px 12px 4px 0;
-  margin: 0 -12px 0 0;
-
-  /* gold-on-cream scrollbar, both engines */
-  scrollbar-width: thin;
-  scrollbar-color: var(--gold) var(--forest-light);
+  padding: 4px 0 0;
+  margin: 0;
 }
-.latest-scroll::-webkit-scrollbar{ width: 9px; }
-.latest-scroll::-webkit-scrollbar-track{
-  background: var(--forest-light);
-  border-radius: 999px;
-}
-.latest-scroll::-webkit-scrollbar-thumb{
-  background: var(--gold);
-  border-radius: 999px;
-  border: 2px solid var(--forest-light);
-}
-.latest-scroll::-webkit-scrollbar-thumb:hover{ background: var(--gold-deep); }
 
 .news-grid{
   display: grid;
@@ -1081,7 +1065,6 @@ main{
     width: calc(100% + 40px);
   }
 
-  .latest-scroll{ max-height: 620px; }
   .news-card{ height: 340px; }
   .news-grid{ grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 
@@ -1112,7 +1095,6 @@ main{
   .news-grid{ grid-template-columns: 1fr; }
   .news-card{ height: auto; min-height: 300px; }
   .news-card-img{ height: 130px; flex-basis: 130px; }
-  .latest-scroll{ max-height: 70vh; }
 
   .carousel{
     aspect-ratio: 4/3;
