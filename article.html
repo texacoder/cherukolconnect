@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cherukol Connect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Rozha+One&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="logo.png">
+<style>
+  :root{
+    --white:#FFFFFF; --paper:#FBFBF9; --ink:#1C2620; --ink-soft:#4E5A52;
+    --forest:#0F4C33; --forest-dark:#0A3323; --forest-light:#E7F1EB;
+    --gold:#B8860B; --gold-light:#E9CE6D; --gold-deep:#8A6A16;
+    --metal-gold: linear-gradient(120deg, var(--gold-deep) 0%, var(--gold) 22%, var(--gold-light) 45%, #FFF3C4 52%, var(--gold-light) 60%, var(--gold) 80%, var(--gold-deep) 100%);
+    --temple:#A6421E;
+    --font-display:'Rozha One', serif;
+    --font-brand:'Cinzel', 'Rozha One', serif;
+    --font-body:'Mukta', sans-serif;
+    --font-body-ml:'Noto Sans Malayalam', 'Mukta', sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  html[lang="ml"] body{ font-family: var(--font-body-ml); }
+  body{
+    margin:0; background:
+      radial-gradient(900px 420px at 100% 0%, rgba(15,76,51,.05), transparent 60%),
+      radial-gradient(700px 380px at 0% 15%, rgba(184,134,11,.05), transparent 55%),
+      var(--paper);
+    color:var(--ink); font-family:var(--font-body); line-height:1.7;
+  }
+  .kasavu-border{
+    height:10px; width:100%;
+    background:
+      repeating-linear-gradient(45deg, rgba(10,51,35,.55) 0 2px, transparent 2px 9px),
+      repeating-linear-gradient(-45deg, rgba(10,51,35,.55) 0 2px, transparent 2px 9px),
+      var(--metal-gold);
+    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1.5px 0 rgba(0,0,0,.25), 0 2px 8px rgba(0,0,0,.18);
+  }
+
+  /* ---- Masthead ---- */
+  .masthead{
+    background:
+      radial-gradient(480px 160px at 10% -10%, rgba(233,206,109,.14), transparent 60%),
+      radial-gradient(600px 200px at 100% 0%, rgba(15,76,51,.5), transparent 65%),
+      linear-gradient(155deg, #0f4a30 0%, var(--forest-dark) 48%, #071f15 100%);
+    color:var(--white);
+    border-bottom:1px solid rgba(233,206,109,.35);
+    box-shadow:0 8px 24px rgba(3,20,13,.32);
+  }
+  .masthead-inner{
+    max-width:760px; margin:0 auto; padding:16px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .masthead-brand{
+    display:inline-flex; align-items:center; gap:8px;
+    color:var(--gold-light); text-decoration:none;
+    font-family:var(--font-brand); font-weight:700; font-size:1.05rem; letter-spacing:.03em;
+  }
+  .masthead-brand svg{ flex-shrink:0; }
+  .masthead-brand span{ color:var(--white); }
+  .masthead-live{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--gold-light); border:1px solid rgba(233,206,109,.4);
+    padding:5px 11px; border-radius:999px; white-space:nowrap;
+  }
+  .masthead-live::before{
+    content:""; width:7px; height:7px; border-radius:50%;
+    background:#ff5b5b; box-shadow:0 0 0 3px rgba(255,91,91,.25);
+  }
+
+  main{ max-width:760px; margin:0 auto; padding:0 20px 70px; }
+
+  /* ---- Breadcrumb ---- */
+  .breadcrumb{
+    display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    font-size:.78rem; color:var(--ink-soft); font-weight:600;
+    padding:16px 0 0;
+  }
+  .breadcrumb a{ color:var(--forest); text-decoration:none; }
+  .breadcrumb a:hover{ text-decoration:underline; }
+  .breadcrumb .sep{ opacity:.5; }
+
+  /* ---- Article header ---- */
+  .article-head{ padding:18px 0 0; }
+  .article-badges{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .badge-pill{
+    display:inline-block; font-size:.72rem; font-weight:800; text-transform:uppercase;
+    letter-spacing:.06em; padding:4px 12px; border-radius:999px;
+    background:linear-gradient(135deg, var(--forest), var(--forest-dark)); color:var(--white);
+    box-shadow:0 3px 10px rgba(15,76,51,.3);
+  }
+  .article-head h1{
+    font-family:var(--font-display); font-weight:400; color:var(--forest-dark);
+    font-size:2.15rem; line-height:1.22; margin:0 0 16px;
+  }
+  html[lang="ml"] .article-head h1{ font-family:var(--font-body-ml); font-weight:800; font-size:1.7rem; }
+
+  .byline{
+    display:flex; align-items:center; flex-wrap:wrap; gap:10px 16px;
+    padding:14px 0; border-top:1px solid rgba(15,76,51,.12); border-bottom:1px solid rgba(15,76,51,.12);
+    font-size:.86rem; color:var(--ink-soft);
+  }
+  .byline-source{
+    display:flex; align-items:center; gap:9px; color:var(--ink); font-weight:700;
+  }
+  .byline-avatar{
+    width:32px; height:32px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg, var(--gold-light), var(--gold));
+    display:flex; align-items:center; justify-content:center; color:var(--forest-dark);
+    box-shadow:0 0 0 2px var(--white), 0 0 0 3px rgba(15,76,51,.15);
+  }
+  .byline-meta{ display:flex; gap:14px; flex-wrap:wrap; margin-left:auto; }
+  .byline-meta span{ display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+  .byline-meta svg{ color:var(--gold-deep); flex-shrink:0; }
+
+  /* ---- Hero image ---- */
+  .article-hero{
+    margin:22px 0 8px; border-radius:14px; overflow:hidden;
+    box-shadow:0 14px 32px rgba(10,51,35,.22), 0 0 0 1px rgba(184,134,11,.18);
+    background:linear-gradient(135deg, var(--forest-light), #D8E9DE);
+  }
+  .article-hero img{
+    width:100%; max-height:420px; object-fit:cover; display:block;
+  }
+
+  /* ---- Body ---- */
+  .article-body{ margin-top:26px; }
+  .article-lead{
+    font-size:1.18rem; color:var(--ink); font-weight:500;
+  }
+  .article-lead::first-letter{
+    font-family:var(--font-display); font-size:3.6rem; line-height:.78; font-weight:400;
+    float:left; margin:6px 10px 0 0; color:var(--forest);
+  }
+  html[lang="ml"] .article-lead::first-letter{
+    font-family:var(--font-body-ml); font-size:1.18rem; font-weight:500;
+    float:none; margin:0;
+  }
+  .article-body p{ white-space:pre-wrap; margin:0 0 1.1em; overflow-wrap:break-word; }
+
+  .article-divider{
+    display:flex; align-items:center; gap:12px; margin:34px 0; color:var(--gold-deep);
+  }
+  .article-divider::before, .article-divider::after{
+    content:""; flex:1; height:1px; background:linear-gradient(to right, transparent, rgba(184,134,11,.4), transparent);
+  }
+  .article-divider svg{ flex-shrink:0; }
+
+  /* ---- Share / back bar ---- */
+  .article-actions{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    margin-top:8px; padding-top:22px;
+  }
+  .btn-back{
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg, var(--forest), var(--forest-dark)); color:var(--white);
+    text-decoration:none; font-weight:700; font-size:.9rem;
+    padding:11px 20px; border-radius:999px; box-shadow:0 4px 14px rgba(10,51,35,.3);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-back:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(10,51,35,.38); }
+  .share-row{ display:flex; align-items:center; gap:8px; }
+  .share-row .label{ font-size:.78rem; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin-right:2px; }
+  .share-btn{
+    width:38px; height:38px; border-radius:50%; border:1px solid rgba(15,76,51,.15);
+    background:var(--white); color:var(--forest); display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 8px rgba(10,51,35,.1); transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    text-decoration:none; cursor:pointer;
+  }
+  .share-btn:hover{ transform:translateY(-2px); background:var(--forest-light); box-shadow:0 5px 14px rgba(10,51,35,.18); }
+
+  footer{
+    background:linear-gradient(160deg, #0d3f2a 0%, var(--forest-dark) 55%, #082a1c 100%);
+    color:rgba(255,255,255,.78); text-align:center; padding:20px; font-size:.82rem; margin-top:48px;
+  }
+  footer .tagline{ color:var(--gold-light); font-weight:600; margin:4px 0 0; font-size:.8rem; }
+
+  /* ---- Loading / not-found states ---- */
+  .state-screen{
+    max-width:760px; margin:60px auto; padding:0 20px; text-align:center; color:var(--ink-soft);
+  }
+  .state-screen h2{
+    font-family:var(--font-display); color:var(--forest-dark); font-weight:400; margin:0 0 10px;
+  }
+  html[lang="ml"] .state-screen h2{ font-family:var(--font-body-ml); font-weight:800; }
+  .state-screen .btn-back{ margin-top:18px; }
+  [hidden]{ display:none !important; }
+
+  @media (max-width:560px){
+    .article-head h1{ font-size:1.55rem; }
+    .article-hero img{ max-height:260px; }
+    .byline-meta{ margin-left:0; }
+    .article-lead{ font-size:1.05rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="kasavu-border"></div>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="masthead-brand" href="index.html">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span id="backLabel">Cherukol Connect</span>
+      </a>
+      <span class="masthead-live" id="liveLabel">Live</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Loading state -->
+    <div class="state-screen" id="loadingState">
+      <h2 id="loadingHeading">Loading…</h2>
+      <p id="loadingSub">Fetching the latest article.</p>
+    </div>
+
+    <!-- Not-found state -->
+    <div class="state-screen" id="notFoundState" hidden>
+      <h2 id="notFoundHeading">Article not found</h2>
+      <p id="notFoundSub">This story may have moved to the archive or been removed.</p>
+      <a class="btn-back" href="index.html" id="notFoundBackLink">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span id="notFoundBackText">Back to Cherukol Connect</span>
+      </a>
+    </div>
+
+    <!-- Article content -->
+    <div id="articleContent" hidden>
+      <nav class="breadcrumb">
+        <a href="index.html" id="crumbHome">Cherukol Connect</a>
+        <span class="sep">/</span>
+        <span id="crumbBadge">Latest</span>
+      </nav>
+
+      <div class="article-head">
+        <div class="article-badges"><span class="badge-pill" id="badgePill">Latest</span></div>
+        <h1 id="articleTitle"></h1>
+        <div class="byline">
+          <div class="byline-source">
+            <span class="byline-avatar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            </span>
+            <span id="sourceLabel">Cherukol Grama Panchayath</span>
+          </div>
+          <div class="byline-meta">
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="articleDate"></span></span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><span id="readTimeLabel">1 min read</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-hero">
+        <img id="articleImage" src="" alt="" onerror="this.parentElement.style.display='none';">
+      </div>
+
+      <article class="article-body">
+        <p class="article-lead" id="articleSummary"></p>
+      </article>
+
+      <div class="article-divider">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5z"/></svg>
+      </div>
+
+      <div class="article-actions">
+        <a class="btn-back" href="index.html" id="bottomBackLink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <span id="bottomBackText">Back to Cherukol Connect</span>
+        </a>
+        <div class="share-row">
+          <span class="label" id="shareLabel">Share</span>
+          <a class="share-btn" title="WhatsApp" target="_blank" rel="noopener" id="whatsappShareBtn" href="#">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.1.2-.3.2-.5.1-1.5-.7-2.4-1.3-3.4-2.9-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5C11 9.7 10.6 8.6 10.4 8.1c-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.5 5.3L2 22l4.9-1.3C8.4 21.5 10.1 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.7 0-3.3-.5-4.7-1.3l-.3-.2-3.2.9.9-3.1-.2-.3C3.6 14.5 3 13.3 3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9z"/></svg>
+          </a>
+          <button type="button" class="share-btn" id="copyTextBtn" title="Copy text">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.5-1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Cherukol Connect — Panchayath News &amp; Services
+    <p class="tagline">നമ്മുടെ പഞ്ചായത്ത്, നമ്മുടെ ശബ്ദം</p>
+  </footer>
+
+<script>
+/* =========================================================
+   ARTICLE PAGE
+   Standalone real page (not a Blob) so a shared link works
+   on any device: it reads ?id=... from the URL, fetches the
+   same published News Google Sheet CSV that the home page
+   uses, finds the matching row, and renders it.
+
+   Keep SHEET_CSV.news in sync with script.js's SHEET_CSV.news
+   — both read from the same published Sheet tab.
+   ========================================================= */
+const NEWS_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=0&single=true&output=csv";
+
+const ARTICLE_I18N = {
+  en: {
+    live: "Live",
+    latest: "Latest",
+    brand: "Cherukol Connect",
+    source: "Cherukol Grama Panchayath",
+    readTime: "1 min read",
+    share: "Share",
+    copyLabel: "Copy text",
+    copiedLabel: "Copied!",
+    backText: "Back to Cherukol Connect",
+    loadingHeading: "Loading…",
+    loadingSub: "Fetching the latest article.",
+    notFoundHeading: "Article not found",
+    notFoundSub: "This story may have moved to the archive or been removed."
+  },
+  ml: {
+    live: "തത്സമയം",
+    latest: "പുതിയത്",
+    brand: "ചെറുകോൽ കണക്റ്റ്",
+    source: "ചെറുകോൽ ഗ്രാമപഞ്ചായത്ത്",
+    readTime: "വായന സമയം: 1 മിനിറ്റ്",
+    share: "പങ്കിടുക",
+    copyLabel: "ടെക്സ്റ്റ് പകർത്തുക",
+    copiedLabel: "പകർത്തി!",
+    backText: "ചെറുകോൽ കണക്റ്റിലേക്ക് മടങ്ങുക",
+    loadingHeading: "ലോഡ് ചെയ്യുന്നു…",
+    loadingSub: "ഏറ്റവും പുതിയ വാർത്ത ലഭ്യമാക്കുന്നു.",
+    notFoundHeading: "വാർത്ത ലഭ്യമല്ല",
+    notFoundSub: "ഈ വാർത്ത ആർക്കൈവിലേക്ക് മാറിയിരിക്കാം അല്ലെങ്കിൽ നീക്കം ചെയ്യപ്പെട്ടിരിക്കാം."
+  }
+};
+
+function getQueryLang(){
+  const params = new URLSearchParams(window.location.search);
+  const fromQuery = params.get("lang");
+  if (fromQuery === "ml" || fromQuery === "en") return fromQuery;
+  try{
+    const saved = localStorage.getItem("cherukolConnectLang");
+    if (saved === "ml" || saved === "en") return saved;
+  }catch(e){ /* ignore */ }
+  return "en";
+}
+
+function at(key){
+  const lang = document.documentElement.getAttribute("lang") === "ml" ? "ml" : "en";
+  return (ARTICLE_I18N[lang] && ARTICLE_I18N[lang][key]) || ARTICLE_I18N.en[key] || key;
+}
+
+function escapeHTML(str){
+  const div = document.createElement("div");
+  div.textContent = str == null ? "" : str;
+  return div.innerHTML;
+}
+
+/* Same small dependency-free CSV parser used in script.js —
+   handles quoted fields, commas inside quotes, escaped quotes. */
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQuotes){
+      if (c === '"'){
+        if (text[i + 1] === '"'){ field += '"'; i++; }
+        else { inQuotes = false; }
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"'){ inQuotes = true; }
+      else if (c === ','){ row.push(field); field = ""; }
+      else if (c === '\n' || c === '\r'){
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); field = "";
+        if (row.length > 1 || row[0] !== "") rows.push(row);
+        row = [];
+      } else {
+        field += c;
+      }
+    }
+  }
+  if (field !== "" || row.length){ row.push(field); rows.push(row); }
+  if (!rows.length) return [];
+
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1)
+    .filter(r => r.some(cell => cell.trim() !== ""))
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, idx) => { obj[h] = (r[idx] || "").trim(); });
+      return obj;
+    });
+}
+
+function parseSheetDate(value){
+  if (!value) return new Date().toISOString();
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+}
+
+function rowToNewsItem(row, i){
+  return {
+    id: row.id || ("sheet-n" + i),
+    title: row.title_en || row.title || "",
+    summary: row.summary_en || row.summary || "",
+    image: row.image || "images/news-placeholder.jpg",
+    date: parseSheetDate(row.date),
+    titleML: row.title_ml || "",
+    summaryML: row.summary_ml || ""
+  };
+}
+
+function formatDate(iso, lang){
+  const locale = lang === "ml" ? "ml-IN" : "en-IN";
+  return new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
+}
+
+function copyArticleText(btn, title, summary){
+  const text = title + "\n\n" + summary;
+  if (navigator.clipboard){
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.title;
+      btn.title = at("copiedLabel");
+      setTimeout(() => { btn.title = original; }, 1500);
+    });
+  }
+}
+
+function showLoading(){
+  document.getElementById("loadingState").hidden = false;
+  document.getElementById("notFoundState").hidden = true;
+  document.getElementById("articleContent").hidden = true;
+}
+
+function showNotFound(){
+  document.getElementById("loadingState").hidden = true;
+  document.getElementById("notFoundState").hidden = false;
+  document.getElementById("articleContent").hidden = true;
+}
+
+function renderArticle(item){
+  const lang = document.documentElement.getAttribute("lang") === "ml" ? "ml" : "en";
+  const title = (lang === "ml" && item.titleML) ? item.titleML : item.title;
+  const summary = (lang === "ml" && item.summaryML) ? item.summaryML : item.summary;
+  const dateStr = formatDate(item.date, lang);
+
+  document.title = title + " — Cherukol Connect";
+  document.getElementById("articleTitle").textContent = title;
+  document.getElementById("articleSummary").textContent = summary;
+  document.getElementById("articleDate").textContent = dateStr;
+  document.getElementById("articleImage").src = item.image;
+
+  const waBtn = document.getElementById("whatsappShareBtn");
+  waBtn.href = "https://wa.me/?text=" + encodeURIComponent(title);
+
+  const copyBtn = document.getElementById("copyTextBtn");
+  copyBtn.title = at("copyLabel");
+  copyBtn.onclick = () => copyArticleText(copyBtn, title, summary);
+
+  document.getElementById("loadingState").hidden = true;
+  document.getElementById("notFoundState").hidden = true;
+  document.getElementById("articleContent").hidden = false;
+}
+
+function applyStaticStrings(){
+  const lang = document.documentElement.getAttribute("lang") === "ml" ? "ml" : "en";
+  document.getElementById("liveLabel").textContent = at("live");
+  document.getElementById("backLabel").textContent = at("brand");
+  document.getElementById("crumbHome").textContent = at("brand");
+  document.getElementById("crumbBadge").textContent = at("latest");
+  document.getElementById("badgePill").textContent = at("latest");
+  document.getElementById("sourceLabel").textContent = at("source");
+  document.getElementById("readTimeLabel").textContent = at("readTime");
+  document.getElementById("shareLabel").textContent = at("share");
+  document.getElementById("bottomBackText").textContent = at("backText");
+  document.getElementById("notFoundBackText").textContent = at("backText");
+  document.getElementById("loadingHeading").textContent = at("loadingHeading");
+  document.getElementById("loadingSub").textContent = at("loadingSub");
+  document.getElementById("notFoundHeading").textContent = at("notFoundHeading");
+  document.getElementById("notFoundSub").textContent = at("notFoundSub");
+
+  // Preserve the chosen language when navigating back to the home page.
+  const backHref = "index.html";
+  document.getElementById("bottomBackLink").href = backHref;
+  document.getElementById("notFoundBackLink").href = backHref;
+}
+
+async function init(){
+  const lang = getQueryLang();
+  document.documentElement.setAttribute("lang", lang);
+  applyStaticStrings();
+  showLoading();
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  if (!id){
+    showNotFound();
+    return;
+  }
+
+  try{
+    const res = await fetch(NEWS_SHEET_CSV_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("Sheet fetch failed: " + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    const items = rows.map(rowToNewsItem).filter(i => i.title);
+    const match = items.find(i => i.id === id);
+
+    if (!match){
+      showNotFound();
+      return;
+    }
+    renderArticle(match);
+  }catch(e){
+    console.warn("Could not load article from Google Sheet.", e);
+    showNotFound();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
