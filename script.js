@@ -8,6 +8,11 @@ const WHATSAPP_NUMBER = "919747787996"; // TODO: replace with the real office Wh
 // Email address the contact form composes a message to.
 const CONTACT_EMAIL = "cherukolegp@gmail.com"; // TODO: replace with real email
 
+// Rotating set of accent colours assigned to Help Desk cards that
+// don't specify their own `color` column in the Sheet, so a plain
+// row still looks distinct from its neighbours.
+const HELPDESK_COLOR_CYCLE = ["blue", "teal", "purple", "brown", "pink", "green"];
+
 // A story counts as "latest" for this many days, then moves to Old News.
 const LATEST_WINDOW_DAYS = 7;
 // A story is removed completely this many days after it was published.
@@ -25,15 +30,15 @@ const WEATHER_ALERT_DISTRICT = "Pathanamthitta";
 /* =========================================================
    CONTENT SOURCE — Google Sheets
    =========================================================
-   The client edits five tabs in one Google Sheet (News,
-   Updates, Achievements, WeatherAlert, HomeSlider). Each tab
-   is published to the web as CSV and fetched here on every
-   page load, so every visitor sees the same content — no
+   The client edits six tabs in one Google Sheet (News,
+   Updates, Achievements, WeatherAlert, HomeSlider, HelpDesk).
+   Each tab is published to the web as CSV and fetched here on
+   every page load, so every visitor sees the same content — no
    login, no admin panel, no code.
 
    SETUP (do this once):
    1. Create a Google Sheet with tabs named exactly:
-      News | Updates | Achievements | WeatherAlert | HomeSlider
+      News | Updates | Achievements | WeatherAlert | HomeSlider | HelpDesk
       (see README-FOR-CLIENT.md for the exact column headers
       each tab needs, and a template link.)
    2. File -> Share -> Publish to web -> choose each individual
@@ -69,14 +74,31 @@ const WEATHER_ALERT_DISTRICT = "Pathanamthitta";
    carousel now — it no longer reuses the Gallery tab's photos
    (GALLERY_IMAGES below), so the client can curate a short,
    separate set of slides for the home page without it affecting
-   the full Photo Gallery page.
+   the full Photo Gallery page. When this tab has no rows yet
+   (or isn't reachable), the carousel falls back to a single
+   local slide (see HOME_CAROUSEL_FALLBACK below) instead of
+   showing an empty box.
+
+   HelpDesk tab columns:
+     name_en, name_ml, role_en, role_ml, phone, group, color
+   - phone: a 10-digit mobile number, or a landline with STD
+     code (e.g. "0468 2222221") — either works as a tap-to-call
+     link.
+   - group: "ward" puts the row under the "Ward Members"
+     sub-heading; leave blank (or anything else) for it to show
+     under the main Help Desk grid (President, Secretary, etc.).
+   - color: optional — one of blue, teal, purple, brown, pink,
+     green. Leave blank to let the page assign one automatically.
+   Replacing a wrong or outdated number is just editing that
+   row — no code changes needed.
    ========================================================= */
 const SHEET_CSV = {
   news:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=0&single=true&output=csv",
   updates:      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2101454905&single=true&output=csv",
   achievements: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=735728458&single=true&output=csv",
   weatherAlert: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=2024229532&single=true&output=csv", // TODO: add a "WeatherAlert" tab to the Sheet, publish it to web as CSV, and paste its link here
-  homeSlider:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=1904233165&single=true&output=csv" // TODO: add a "HomeSlider" tab to the Sheet, publish it to web as CSV, and paste its link here
+  homeSlider:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJK5YMcn6VV8MIAAbqJqBNBPedOqanyVx2eZPvmA9L3AZ-B0BcMFmLAJ9QISg7lr_DIze9N_JRt0u1/pub?gid=1904233165&single=true&output=csv", // TODO: add a "HomeSlider" tab to the Sheet, publish it to web as CSV, and paste its link here
+  helpDesk:     "PASTE_YOUR_PUBLISHED_ID_HERE" // TODO: add a "HelpDesk" tab to the Sheet, publish it to web as CSV, and paste its link here
 };
 
 // How often (in ms) to re-fetch the Sheet while the site is open,
@@ -116,66 +138,12 @@ const GALLERY_CAPTIONS_ML = {
 };
 
 /* =========================================================
-   HELP DESK — quick-dial contacts shown on the home page.
-   Not sourced from the Sheet; edit these arrays directly to
-   change names/numbers. `key` points at an i18n string below
-   so each entry has an English + Malayalam label out of the
-   box; `phone` is a plain 10-digit number (no spaces/+91).
-   `icon` picks the badge glyph, `color` picks the badge/accent
-   colour (see the .helpdesk-* classes in styles.css).
+   HELP DESK — quick-dial contact cards shown on the home
+   page. Sourced entirely from the "HelpDesk" Sheet tab (see
+   SHEET_CSV.helpDesk above and rowToHelpDeskItem below) so the
+   office can fix a wrong number or add/remove a ward member
+   themselves, the same way they edit News or Updates.
    ========================================================= */
-const HELP_DESK_CONTACTS = [
-  { key: "helpdesk.president",          phone: "9747787996", icon: "person",    color: "green"  },
-  { key: "helpdesk.vicePresident",      phone: "9447421293", icon: "person",    color: "orange" },
-  { key: "helpdesk.secretary",          phone: "9495301223", icon: "pen",       color: "blue"   },
-  { key: "helpdesk.assistantSecretary", phone: "9539123495", icon: "person",    color: "purple" },
-  { key: "helpdesk.seniorClerk",        phone: "9495383970", icon: "clipboard", color: "brown"  }
-];
-
-const HELP_DESK_WARD_MEMBERS = [
-  { key: "helpdesk.ward1", phone: "9447116372", icon: "group", color: "green" },
-  { key: "helpdesk.ward2", phone: "8590648211", icon: "group", color: "pink"  },
-  { key: "helpdesk.ward3", phone: "9847296107", icon: "group", color: "blue"  }
-];
-
-/* =========================================================
-   EMERGENCY CONTACTS — district / taluk / forest division
-   control room numbers shown in the home page's "Emergency
-   Contacts" section (below Help Desk). Not sourced from the
-   Sheet; edit these directly to change names/numbers.
-   Sourced from the district's printed control-room poster.
-
-   - EMERGENCY_DEOC: the single district Collectorate Control
-     Room banner at the top, with its EN/ML label and one or
-     more numbers (landline, toll-free, mobile) each rendered
-     as its own tap-to-call chip.
-   - EMERGENCY_TEOC: one row per Taluk Control Room, rendered
-     with the same card style as Help Desk (`color` picks the
-     badge/accent colour from the .helpdesk-* classes).
-   - EMERGENCY_FOREST: Forest Division control rooms.
-   `phone` can be a landline (with STD code, e.g. "0468 2222221"),
-   a toll-free number (e.g. "1077"), or a 10-digit mobile number —
-   the tel: link is built appropriately for each in script below.
-   ========================================================= */
-const EMERGENCY_DEOC = {
-  name: "Collectorate Control Room (DEOC)",
-  nameML: "കളക്ടറേറ്റ് കൺട്രോൾ റും (DEOC)",
-  numbers: ["04682 322515", "1077", "+91 80788 08915"]
-};
-
-const EMERGENCY_TEOC = [
-  { name: "Kozhencherry Control Room", nameML: "കോഴഞ്ചേരി കൺട്രോൾ റും", phone: "0468 2222221", icon: "person", color: "blue"   },
-  { name: "Mallappally Control Room",  nameML: "മല്ലപ്പള്ളി കൺട്രോൾ റും", phone: "0469 2682293", icon: "person", color: "orange" },
-  { name: "Adoor Control Room",        nameML: "അടൂർ കൺട്രോൾ റും",       phone: "04734 224826",  icon: "person", color: "purple" },
-  { name: "Ranni Control Room",        nameML: "റാന്നി കൺട്രോൾ റും",     phone: "04735 227442",  icon: "person", color: "brown"  },
-  { name: "Thiruvalla Control Room",   nameML: "തിരുവല്ല കൺട്രോൾ റും",   phone: "0469 2601303",  icon: "person", color: "pink"   },
-  { name: "Konni Control Room",        nameML: "കോന്നി കൺട്രോൾ റും",     phone: "0468 2240087",  icon: "person", color: "blue"   }
-];
-
-const EMERGENCY_FOREST = [
-  { name: "Forest Division Control Room — Ranni", nameML: "ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും — റാന്നി", phone: "9188407515", icon: "group", color: "green" },
-  { name: "Forest Division Control Room — Konni", nameML: "ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും — കോന്നി", phone: "9188407513", icon: "group", color: "green" }
-];
 
 /* =========================================================
    i18n — English / Malayalam
@@ -211,7 +179,7 @@ const I18N = {
 
     "gallery.eyebrow": "Around the Panchayath",
     "gallery.title": "Photo Gallery",
-    "gallery.sub": "Capturing cherukole panchayat's initiatives,emergency response,community events,and public services.",
+    "gallery.sub": "Capturing Cherukole Panchayath's initiatives, emergency response, community events, and public services.",
 
     "complaint.eyebrow": "Grievance Redressal",
     "complaint.sub": "Fill in the details below. Submitting opens WhatsApp with your message pre-filled, ready to send to the Panchayath office.",
@@ -241,7 +209,7 @@ const I18N = {
     "contact.send": "Send Message",
     "contact.note": "Opens your email app with this message ready to send.",
 
-    "footer.text": "Cherukol Connect — Panchayath News & Services. Built for the community.",
+    "footer.text": "Cherukole Connect — Panchayath News & Services. Built for the community.",
 
     "card.latest": "Latest",
     "card.archive": "Archive",
@@ -252,25 +220,12 @@ const I18N = {
     "card.readMore": "Read more",
     "card.close": "Close",
 
+    "home.reportIssue": "Report an Issue",
+
     "helpdesk.eyebrow": "Quick Contacts",
     "helpdesk.title": "Help Desk",
     "helpdesk.sub": "Reach out directly to Panchayath officials and ward members — tap a card to call.",
     "helpdesk.wardHeading": "Ward Members",
-    "helpdesk.president": "President",
-    "helpdesk.vicePresident": "Vice President",
-    "helpdesk.secretary": "Secretary",
-    "helpdesk.assistantSecretary": "Assistant Secretary",
-    "helpdesk.seniorClerk": "Senior Clerk",
-    "helpdesk.ward1": "Ward 1 Member",
-    "helpdesk.ward2": "Ward 2 Member",
-    "helpdesk.ward3": "Ward 3 Member",
-
-    "emergency.eyebrow": "In Case of Emergency",
-    "emergency.title": "Emergency Contacts",
-    "emergency.sub": "District, Taluk, and Forest Division control room numbers for Pathanamthitta.",
-    "emergency.deocTitle": "Collectorate Control Room (DEOC)",
-    "emergency.teocHeading": "Taluk Control Rooms (TEOC)",
-    "emergency.forestHeading": "Forest Division Control Room",
 
     "weatherAlert.level.red": "Red Alert",
     "weatherAlert.level.orange": "Orange Alert",
@@ -308,7 +263,7 @@ const I18N = {
 
     "gallery.eyebrow": "പഞ്ചായത്തിന് ചുറ്റും",
     "gallery.title": "ഫോട്ടോ ഗാലറി",
-    "gallery.sub": "ചെറുകോൾ പഞ്ചായത്തിന്റെ പദ്ധതികൾ, അടിയന്തര പ്രതികരണ പ്രവർത്തനങ്ങൾ, സമൂഹ പരിപാടികൾ, പൊതുസേവനങ്ങൾ എന്നിവ രേഖപ്പെടുത്തുന്നു.",
+    "gallery.sub": "ചെറുകോൽ പഞ്ചായത്തിന്റെ പദ്ധതികൾ, അടിയന്തര പ്രതികരണ പ്രവർത്തനങ്ങൾ, സമൂഹ പരിപാടികൾ, പൊതുസേവനങ്ങൾ എന്നിവ രേഖപ്പെടുത്തുന്നു.",
 
     "complaint.eyebrow": "പരാതി പരിഹാരം",
     "complaint.sub": "താഴെയുള്ള വിവരങ്ങൾ പൂരിപ്പിക്കുക. സമർപ്പിക്കുമ്പോൾ നിങ്ങളുടെ സന്ദേശം മുൻകൂട്ടി പൂരിപ്പിച്ച നിലയിൽ WhatsApp തുറക്കും, പഞ്ചായത്ത് ഓഫീസിലേക്ക് അയക്കാൻ തയ്യാർ.",
@@ -353,21 +308,8 @@ const I18N = {
     "helpdesk.title": "ഹെൽപ്പ് ഡെസ്ക്",
     "helpdesk.sub": "പഞ്ചായത്ത് ഉദ്യോഗസ്ഥരുമായും വാർഡ് അംഗങ്ങളുമായും നേരിട്ട് ബന്ധപ്പെടുക — വിളിക്കാൻ കാർഡിൽ ടാപ്പ് ചെയ്യുക.",
     "helpdesk.wardHeading": "വാർഡ് അംഗങ്ങൾ",
-    "helpdesk.president": "പ്രസിഡന്റ്",
-    "helpdesk.vicePresident": "വൈസ് പ്രസിഡന്റ്",
-    "helpdesk.secretary": "സെക്രട്ടറി",
-    "helpdesk.assistantSecretary": "അസിസ്റ്റന്റ് സെക്രട്ടറി",
-    "helpdesk.seniorClerk": "സീനിയർ ക്ലാർക്ക്",
-    "helpdesk.ward1": "വാർഡ് 1 മെമ്പർ",
-    "helpdesk.ward2": "വാർഡ് 2 മെമ്പർ",
-    "helpdesk.ward3": "വാർഡ് 3 മെമ്പർ",
 
-    "emergency.eyebrow": "അടിയന്തര ഘട്ടങ്ങളിൽ",
-    "emergency.title": "അടിയന്തര നമ്പറുകൾ",
-    "emergency.sub": "പത്തനംതിട്ട ജില്ലയിലെ ജില്ലാ, താലൂക്ക്, ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും നമ്പറുകൾ.",
-    "emergency.deocTitle": "കളക്ടറേറ്റ് കൺട്രോൾ റും (DEOC)",
-    "emergency.teocHeading": "താലൂക്ക് കൺട്രോൾ റും (TEOC)",
-    "emergency.forestHeading": "ഫോറസ്റ്റ് ഡിവിഷൻ കൺട്രോൾ റും",
+    "home.reportIssue": "ഒരു പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക",
 
     "weatherAlert.level.red": "റെഡ് അലേർട്ട്",
     "weatherAlert.level.orange": "ഓറഞ്ച് അലേർട്ട്",
@@ -410,7 +352,6 @@ function applyTranslations(){
   renderGallery();
   renderCarousel();
   renderHelpDesk();
-  renderEmergencyContacts();
   renderWeatherAlert();
 }
 
@@ -590,6 +531,26 @@ function rowToHomeSliderItem(row, i){
   };
 }
 
+// Help Desk — one row per official or ward member. `group` of
+// "ward" (case-insensitive) sorts a row into the Ward Members
+// grid instead of the main Help Desk grid; `color`, if left
+// blank, is assigned automatically by cycling HELPDESK_COLOR_CYCLE
+// so neighbouring cards still look distinct.
+function rowToHelpDeskItem(row, i){
+  return {
+    id: row.id || ("sheet-hd" + i),
+    name: row.name_en || row.name || "",
+    role: row.role_en || row.role || "",
+    phone: row.phone || "",
+    isWard: (row.group || "").trim().toLowerCase() === "ward",
+    color: (row.color || "").trim().toLowerCase() || HELPDESK_COLOR_CYCLE[i % HELPDESK_COLOR_CYCLE.length],
+    _ml: {
+      name: row.name_ml || "",
+      role: row.role_ml || ""
+    }
+  };
+}
+
 // In-memory caches. Populated entirely from the Google Sheet on
 // load (and every SHEET_REFRESH_MS after). They start empty and
 // stay empty until the Sheet is configured and reachable — the
@@ -599,6 +560,7 @@ let updatesCache = [];
 let achievementsCache = [];
 let weatherAlertCache = [];
 let homeSliderCache = [];
+let helpDeskCache = [];
 
 // Tracks which news card is currently expanded (blog-style
 // read-more), keyed by item id, so it survives re-renders
@@ -627,6 +589,10 @@ async function loadHomeSliderFromSheet(){
   const rows = await fetchSheet(SHEET_CSV.homeSlider);
   if (rows) homeSliderCache = rows.map(rowToHomeSliderItem).filter(i => i.image);
 }
+async function loadHelpDeskFromSheet(){
+  const rows = await fetchSheet(SHEET_CSV.helpDesk);
+  if (rows) helpDeskCache = rows.map(rowToHelpDeskItem).filter(i => i.name && i.phone);
+}
 
 async function refreshAllFromSheet(){
   await Promise.all([
@@ -634,13 +600,15 @@ async function refreshAllFromSheet(){
     loadUpdatesFromSheet(),
     loadAchievementsFromSheet(),
     loadWeatherAlertFromSheet(),
-    loadHomeSliderFromSheet()
+    loadHomeSliderFromSheet(),
+    loadHelpDeskFromSheet()
   ]);
   renderAllNews();
   renderUpdates();
   renderAchievements();
   renderWeatherAlert();
   renderCarousel();
+  renderHelpDesk();
 }
 
 /* ---------------------------------------------------------
@@ -839,12 +807,28 @@ const CAROUSEL_INTERVAL_MS = 4500;
 let carouselIndex = 0;
 let carouselTimer = null;
 
+// Shown when the "HomeSlider" Sheet tab has no rows yet (or isn't
+// reachable) so the hero never renders as an empty box — a single
+// local image with a generic caption, in each language.
+const HOME_CAROUSEL_FALLBACK = [
+  {
+    id: "fallback-1",
+    image: "img.jpg",
+    caption: "Cherukole Grama Panchayath",
+    _ml: { caption: "ചെറുകോൽ ഗ്രാമപഞ്ചായത്ത്" }
+  }
+];
+
+function getCarouselSlides(){
+  return (homeSliderCache.length ? homeSliderCache : HOME_CAROUSEL_FALLBACK).map(localize);
+}
+
 function renderCarousel(){
   const track = document.getElementById("carouselTrack");
   const dotsWrap = document.getElementById("carouselDots");
   if (!track || !dotsWrap) return;
 
-  const slides = homeSliderCache.map(localize);
+  const slides = getCarouselSlides();
 
   track.innerHTML = slides.map(item => {
     const caption = item.caption || "";
@@ -867,7 +851,7 @@ function renderCarousel(){
 function updateCarouselPosition(){
   const track = document.getElementById("carouselTrack");
   if (!track) return;
-  const count = homeSliderCache.length;
+  const count = getCarouselSlides().length;
   if (count === 0) return;
   if (carouselIndex < 0) carouselIndex = count - 1;
   if (carouselIndex >= count) carouselIndex = 0;
@@ -889,7 +873,7 @@ function carouselPrev(){ carouselGoTo(carouselIndex - 1); }
 
 function startCarouselAutoplay(){
   stopCarouselAutoplay();
-  if (homeSliderCache.length <= 1) return;
+  if (getCarouselSlides().length <= 1) return;
   carouselTimer = setInterval(carouselNext, CAROUSEL_INTERVAL_MS);
 }
 
@@ -1026,36 +1010,15 @@ function renderWeatherAlert(){
 
 /* ---------------------------------------------------------
    Help Desk — quick-dial contact cards (rendering)
-   Static data (HELP_DESK_CONTACTS / HELP_DESK_WARD_MEMBERS
-   above), not from the Sheet. Icons are picked per-entry via
-   the `icon` field; colours via the `color` field, matching
-   the .helpdesk-* classes in styles.css.
+   Data comes from helpDeskCache (the "HelpDesk" Sheet tab).
+   Every row uses the same generic person icon; `color`
+   (assigned in rowToHelpDeskItem when the Sheet leaves it
+   blank) picks which .helpdesk-* accent it gets.
    --------------------------------------------------------- */
 function helpDeskPersonIconSVG(){
   return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <circle cx="12" cy="8" r="4"/>
     <path d="M4 21c0-4 3.8-6.5 8-6.5s8 2.5 8 6.5"/>
-  </svg>`;
-}
-function helpDeskPenIconSVG(){
-  return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <path d="M12 20h9"/>
-    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-  </svg>`;
-}
-function helpDeskClipboardIconSVG(){
-  return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <rect x="6" y="4" width="12" height="17" rx="2"/>
-    <path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/>
-    <path d="M9 11h6M9 15h6"/>
-  </svg>`;
-}
-function helpDeskGroupIconSVG(){
-  return `<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="9" cy="8" r="3"/>
-    <path d="M2 20c0-3.3 3.1-5 7-5s7 1.7 7 5"/>
-    <circle cx="17.5" cy="9" r="2.3"/>
-    <path d="M15.6 13.1c2.7.4 4.9 1.9 4.9 4"/>
   </svg>`;
 }
 function helpDeskPhoneIconSVG(){
@@ -1064,54 +1027,17 @@ function helpDeskPhoneIconSVG(){
   </svg>`;
 }
 
-function helpDeskIconFor(type){
-  switch(type){
-    case "pen": return helpDeskPenIconSVG();
-    case "clipboard": return helpDeskClipboardIconSVG();
-    case "group": return helpDeskGroupIconSVG();
-    default: return helpDeskPersonIconSVG();
-  }
-}
-
-// Displays a 10-digit number as "XXXXX XXXXX" for readability.
+// Displays a 10-digit number as "XXXXX XXXXX" for readability;
+// leaves anything else (a landline with an STD code, etc.) as-is.
 function formatHelpDeskPhone(phone){
   const digits = phone.replace(/\D/g, "");
   if (digits.length !== 10) return phone;
   return digits.slice(0, 5) + " " + digits.slice(5);
 }
 
-function helpDeskItemHTML(contact){
-  const name = escapeHTML(t(contact.key));
-  const digits = contact.phone.replace(/\D/g, "");
-  return `
-    <a class="helpdesk-item helpdesk-${contact.color}" href="tel:+91${digits}">
-      <span class="helpdesk-icon">${helpDeskIconFor(contact.icon)}</span>
-      <span class="helpdesk-name">${name}</span>
-      <span class="helpdesk-phone">${helpDeskPhoneIconSVG()}${formatHelpDeskPhone(contact.phone)}</span>
-    </a>`;
-}
-
-function renderHelpDesk(){
-  const grid = document.getElementById("helpDeskGrid");
-  const wardGrid = document.getElementById("helpDeskWardGrid");
-  if (grid) grid.innerHTML = HELP_DESK_CONTACTS.map(helpDeskItemHTML).join("");
-  if (wardGrid) wardGrid.innerHTML = HELP_DESK_WARD_MEMBERS.map(helpDeskItemHTML).join("");
-}
-
-/* ---------------------------------------------------------
-   Emergency Contacts — rendering.
-   Static data (EMERGENCY_DEOC / EMERGENCY_TEOC /
-   EMERGENCY_FOREST above), not from the Sheet. TEOC and
-   Forest rows reuse the same .helpdesk-item card markup as
-   the Help Desk section above (so both look consistent);
-   the DEOC district number gets its own red banner with one
-   tap-to-call chip per number, since it can list more than
-   a single phone number (landline, toll-free, mobile).
-   --------------------------------------------------------- */
-
 // Builds a tel: href from a raw phone string, handling landlines
-// (STD code, e.g. "0468 2222221"), toll-free numbers (e.g. "1077"),
-// and mobile numbers (10-digit, or already prefixed with +91).
+// (STD code, e.g. "0468 2222221") and mobile numbers (10-digit,
+// or already prefixed with +91).
 function toTelHref(phone){
   const trimmed = phone.trim();
   const digits = trimmed.replace(/[^\d+]/g, "");
@@ -1120,48 +1046,36 @@ function toTelHref(phone){
   return `tel:${digits}`;
 }
 
-function emergencyDeocItemHTML(contact){
-  const name = escapeHTML(t(contact.key));
-  const digits = contact.phone.replace(/\D/g, "");
+function helpDeskItemHTML(contact){
+  const item = localize(contact);
   return `
-    <a class="helpdesk-item helpdesk-${contact.color}" href="tel:+91${digits}">
-      <span class="helpdesk-icon">${helpDeskIconFor(contact.icon)}</span>
-      <span class="helpdesk-name">${name}</span>
-      <span class="helpdesk-phone">${helpDeskPhoneIconSVG()}${formatHelpDeskPhone(contact.phone)}</span>
+    <a class="helpdesk-item helpdesk-${item.color}" href="${toTelHref(item.phone)}">
+      <span class="helpdesk-icon">${helpDeskPersonIconSVG()}</span>
+      <span class="helpdesk-name">
+        <strong>${escapeHTML(item.name)}</strong>
+        ${item.role ? `<span>${escapeHTML(item.role)}</span>` : ""}
+      </span>
+      <span class="helpdesk-phone">${helpDeskPhoneIconSVG()}${formatHelpDeskPhone(item.phone)}</span>
     </a>`;
 }
 
-// TEOC/Forest rows have inline name/phone (not an i18n `key` like
-// Help Desk), with a separate Malayalam string in `nameML`.
-function emergencyRowHTML(row){
-  const lang = getCurrentLang();
-  const name = escapeHTML(lang === "ml" && row.nameML ? row.nameML : row.name);
-  return `
-    <a class="helpdesk-item helpdesk-${row.color}" href="${toTelHref(row.phone)}">
-      <span class="helpdesk-icon">${helpDeskIconFor(row.icon)}</span>
-      <span class="helpdesk-name">${name}</span>
-      <span class="helpdesk-phone">${helpDeskPhoneIconSVG()}${escapeHTML(row.phone)}</span>
-    </a>`;
-}
+function renderHelpDesk(){
+  const section = document.getElementById("helpDeskSection");
+  const grid = document.getElementById("helpDeskGrid");
+  const wardHeading = document.getElementById("helpDeskWardHeading");
+  const wardGrid = document.getElementById("helpDeskWardGrid");
 
-function emergencyDeocHTML(){
-  const lang = getCurrentLang();
-  const title = escapeHTML(t("emergency.deocTitle"));
-  const numbersHTML = EMERGENCY_DEOC.numbers.map(num => `
-    <a href="${toTelHref(num)}">${helpDeskPhoneIconSVG()}${escapeHTML(num)}</a>
-  `).join("");
-  return `
-    <p class="emergency-deoc-title">${title}</p>
-    <div class="emergency-deoc-numbers">${numbersHTML}</div>`;
-}
+  const officials = helpDeskCache.filter(c => !c.isWard);
+  const wardMembers = helpDeskCache.filter(c => c.isWard);
 
-function renderEmergencyContacts(){
-  const deocEl = document.getElementById("emergencyDeoc");
-  const teocGrid = document.getElementById("emergencyTeocGrid");
-  const forestGrid = document.getElementById("emergencyForestGrid");
-  if (deocEl) deocEl.innerHTML = emergencyDeocHTML();
-  if (teocGrid) teocGrid.innerHTML = EMERGENCY_TEOC.map(emergencyRowHTML).join("");
-  if (forestGrid) forestGrid.innerHTML = EMERGENCY_FOREST.map(emergencyRowHTML).join("");
+  if (grid) grid.innerHTML = officials.map(helpDeskItemHTML).join("");
+  if (wardGrid) wardGrid.innerHTML = wardMembers.map(helpDeskItemHTML).join("");
+  if (wardHeading) wardHeading.hidden = wardMembers.length === 0;
+
+  // The whole section stays hidden until the office has added at
+  // least one row to the HelpDesk Sheet tab, rather than showing
+  // an empty "Help Desk" heading with no cards under it.
+  if (section) section.hidden = helpDeskCache.length === 0;
 }
 
 /* =========================================================
@@ -1200,7 +1114,7 @@ function initComplaintForm(){
     const message = document.getElementById("cMessage").value.trim();
 
     const lines = [
-      "*New Complaint via Cherukol Connect*",
+      "*New Complaint via Cherukole Connect*",
       `Name: ${name}`,
       ward ? `Ward/Area: ${ward}` : null,
       `Phone: ${phone}`,
@@ -1227,7 +1141,7 @@ function initContactForm(){
     const email = document.getElementById("ctEmail").value.trim();
     const message = document.getElementById("ctMessage").value.trim();
 
-    const subject = encodeURIComponent(`Message from ${name} via Cherukol Connect`);
+    const subject = encodeURIComponent(`Message from ${name} via Cherukole Connect`);
     const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
     form.reset();
@@ -1265,7 +1179,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderAchievements();
   renderGallery();
   renderHelpDesk();
-  renderEmergencyContacts();
   renderWeatherAlert();
   initCarousel();
   initComplaintForm();

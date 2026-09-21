@@ -1,47 +1,45 @@
 /* =========================================================
    TOKENS
-   Palette: forest green, metallic gold, white.
+   Modern, minimal civic/government palette: deep institutional
+   blue, warm amber for emphasis/alerts, neutral cool grays.
    ========================================================= */
 :root{
   --white:      #FFFFFF;
-  --paper:      #FCFAF4;   /* warm ivory page background, not stark white */
-  --ink:        #1C2620;
-  --ink-soft:   #4E5A52;
+  --paper:      #F6F8FB;   /* page background */
+  --surface:    #FFFFFF;   /* card/panel background */
+  --ink:        #1A2333;
+  --ink-soft:   #5B6478;
+  --border:     #E3E8F0;
 
-  --forest:       #0F4C33;  /* primary forest green */
-  --forest-dark:  #0A3323;  /* deep green for header/footer */
-  --forest-light: #E7F1EB;  /* pale green tint for surfaces */
+  --primary:       #1B4C96;  /* institutional blue */
+  --primary-dark:  #123568;
+  --primary-darker:#0C2549;
+  --primary-light: #EAF1FC;  /* pale blue tint for surfaces */
 
-  --gold:        #B8860B;  /* base metallic gold */
-  --gold-light:  #E9CE6D;  /* highlight */
-  --gold-deep:   #8A6A16;  /* shadow tone */
-  --metal-gold: linear-gradient(120deg, var(--gold-deep) 0%, var(--gold) 22%, var(--gold-light) 45%, #FFF3C4 52%, var(--gold-light) 60%, var(--gold) 80%, var(--gold-deep) 100%);
+  --accent:       #C4780F;  /* amber — CTAs, highlights, "fresh" tags */
+  --accent-light: #FCEFD9;
+  --accent-dark:  #93590A;
 
-  --temple:      #A6421E;  /* warm terracotta-red accent, used sparingly for urgency */
-  --temple-light:#F6E2D8;
+  --danger:       #B3261E;
+  --danger-light: #FBEAE9;
+  --warning:      #C4780F;
+  --warning-light:#FCEFD9;
+  --caution:      #A38300;
+  --caution-light:#FBF6DC;
 
-  --font-display: 'Rozha One', serif;
-  --font-body: 'Mukta', sans-serif;
-  --font-body-ml: 'Noto Sans Malayalam', 'Mukta', sans-serif;
-  --font-brand: 'Cinzel', 'Rozha One', serif;
+  --font-body:    'Inter', 'Mukta', sans-serif;
+  --font-body-ml: 'Noto Sans Malayalam', 'Inter', sans-serif;
+  --font-display: 'Inter', 'Mukta', sans-serif;
 
-  --radius: 12px;
-  --shadow: 0 10px 28px rgba(10,51,35,0.16);
-  --shadow-sm: 0 3px 12px rgba(10,51,35,0.10);
-  --shadow-gold: 0 3px 10px rgba(184,134,11,.28);
+  --radius:    10px;
+  --radius-lg: 14px;
+  --shadow:    0 12px 28px rgba(18,32,64,.10);
+  --shadow-sm: 0 2px 10px rgba(18,32,64,.07);
 }
 
 *{ box-sizing: border-box; }
 html{ scroll-behavior: smooth; }
 
-/* ---------------------------------------------------------
-   Global overflow-x guard.
-   Without this, any single overflowing child (long word,
-   un-shrinkable grid/flex item, etc.) turns into page-wide
-   horizontal scroll on large viewports. This does NOT affect
-   vertical scrolling or mobile/tablet layout at all — it only
-   clips stray horizontal overflow that shouldn't be there.
-   --------------------------------------------------------- */
 html, body{
   max-width: 100%;
   overflow-x: hidden;
@@ -49,19 +47,13 @@ html, body{
 
 body{
   margin:0;
-  background:
-    radial-gradient(900px 420px at 100% 0%, rgba(15,76,51,.045), transparent 60%),
-    radial-gradient(700px 380px at 0% 15%, rgba(184,134,11,.045), transparent 55%),
-    var(--paper);
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
 }
 
-/* When Malayalam is active, swap the body font so glyphs render
-   correctly and with comfortable spacing. Headings keep using a
-   Malayalam-aware fallback too since Rozha One has no ML glyphs. */
 html[lang="ml"] body{
   font-family: var(--font-body-ml);
 }
@@ -70,75 +62,51 @@ html[lang="ml"] h1, html[lang="ml"] h2, html[lang="ml"] h3{
   font-weight: 700;
 }
 
-/* The "CherukolConnect" wordmark stays in Latin script even when
-   the site is switched to Malayalam, so it should keep the same
-   brand font used in the English view (Cinzel/Rozha One) instead
-   of falling back to Noto Sans Malayalam, which renders Latin
-   letters in an unattractive, mismatched style. */
+/* The "CherukoleConnect" wordmark stays in Latin script even when
+   the site is switched to Malayalam. */
 html[lang="ml"] .brand-text h1{
-  font-family: var(--font-brand);
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 800;
 }
 
 h1,h2,h3{
   font-family: var(--font-display);
-  font-weight: 400;
-  color: var(--forest-dark);
+  font-weight: 700;
+  color: var(--ink);
   margin: 0 0 .3em;
+  letter-spacing: -.01em;
 }
 
 a{ color: inherit; }
-
 button{ font-family: inherit; cursor:pointer; }
 
 /* =========================================================
-   KASAVU BORDER SIGNATURE ELEMENT — metallic gold zari edge
-   Framed by two hairlines with a woven diamond texture in
-   between, closer to a real kasavu saree border than a flat
-   gradient strip.
+   TOP IDENTITY BAR — a single flat strip of institutional
+   blue, standing in for the old decorative kasavu border.
+   Quiet, flat, and unambiguous rather than ornamental.
    ========================================================= */
 .kasavu-border{
-  height: 11px;
+  height: 4px;
   width: 100%;
-  position: relative;
-  background:
-    repeating-linear-gradient(45deg, rgba(10,51,35,.55) 0 2px, transparent 2px 9px),
-    repeating-linear-gradient(-45deg, rgba(10,51,35,.55) 0 2px, transparent 2px 9px),
-    var(--metal-gold);
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,.55),
-    inset 0 -1.5px 0 rgba(0,0,0,.25),
-    0 2px 8px rgba(0,0,0,.18);
+  background: var(--primary);
 }
 
 /* =========================================================
-   HEADER
-   Full-width bar with a richer, deeper surface: a two-tone
-   forest gradient (a touch of near-black at the edges keeps it
-   from reading flat), a soft gold glow behind the emblem, and a
-   fine gold hairline along the bottom edge that separates it
-   from the kasavu border below instead of the two effects
-   competing. Content is capped and centered like the rest of
-   the page (main also caps at 1100px) so brand + nav line up
-   with everything under it.
+   HEADER — clean white bar, sticky, minimal chrome.
    ========================================================= */
 .site-header{
-  background:
-    radial-gradient(480px 160px at 10% -10%, rgba(233,206,109,.14), transparent 60%),
-    radial-gradient(600px 200px at 100% 0%, rgba(15,76,51,.5), transparent 65%),
-    linear-gradient(155deg, #0f4a30 0%, var(--forest-dark) 48%, #071f15 100%);
-  color: var(--white);
+  background: var(--white);
+  color: var(--ink);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 8px 24px rgba(3,20,13,.32);
-  border-bottom: 1px solid rgba(233,206,109,.35);
+  box-shadow: 0 1px 0 var(--border);
 }
 
 .header-inner{
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 16px 20px 14px;
+  padding: 14px 20px;
   position: relative;
 }
 
@@ -153,26 +121,22 @@ button{ font-family: inherit; cursor:pointer; }
 .brand{
   display:flex;
   align-items:center;
-  gap: 14px;
-  min-width: 0; /* allow brand text to shrink instead of forcing header wide */
+  gap: 12px;
+  min-width: 0;
 }
 
 .brand-emblem{
   flex-shrink:0;
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow:
-    0 0 0 2px var(--forest-dark),
-    0 0 0 4px var(--gold-light),
-    0 4px 12px rgba(0,0,0,.4),
-    0 0 0 7px rgba(233,206,109,.08);
-  transition: box-shadow .2s ease, transform .2s ease;
+  box-shadow: 0 0 0 1px var(--border);
+  transition: box-shadow .2s ease;
 }
 .brand-emblem img{
   width: 100%;
@@ -181,43 +145,28 @@ button{ font-family: inherit; cursor:pointer; }
   display: block;
 }
 .brand:hover .brand-emblem{
-  box-shadow:
-    0 0 0 2px var(--forest-dark),
-    0 0 0 4px var(--gold-light),
-    0 0 16px rgba(233,206,109,.6),
-    0 0 0 7px rgba(233,206,109,.14);
-  transform: scale(1.04);
+  box-shadow: 0 0 0 1px var(--primary);
 }
 
 .brand-text h1{
-  font-family: var(--font-brand);
-  font-size: 1.42rem;
-  font-weight: 700;
-  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  font-weight: 800;
+  color: var(--ink);
   margin:0;
   line-height: 1.15;
-  letter-spacing: .035em;
-  text-shadow: 0 2px 6px rgba(0,0,0,.35);
+  letter-spacing: -.01em;
 }
-.brand-text h1 span{ color: var(--gold-light); }
+.brand-text h1 span{ color: var(--primary); }
 
-/* Fine gold rule under the wordmark — a quiet echo of the
-   kasavu border, gives the brand block a bit more presence. */
 .brand-text{
-  padding-bottom: 3px;
-  border-bottom: 1px solid rgba(233,206,109,.32);
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
-/* Cinzel renders visually larger than Noto Sans Malayalam at the
-   same font-size, so trim it slightly. Applied in both languages
-   now, since the wordmark always uses Cinzel (see rule above). */
 html[lang="en"] .brand-text h1,
-html[lang="ml"] .brand-text h1{ font-size: 1.3rem; }
+html[lang="ml"] .brand-text h1{ font-size: 1.22rem; }
 
-/* ---------------------------------------------------------
-   Header actions — wraps the new language toggle + the
-   existing mobile hamburger so they sit together on the right.
-   --------------------------------------------------------- */
 .header-actions{
   display: flex;
   align-items: center;
@@ -229,23 +178,21 @@ html[lang="ml"] .brand-text h1{ font-size: 1.3rem; }
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
-  border: 1px solid rgba(233,206,109,.5);
-  color: var(--white);
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--ink);
   padding: 7px 14px;
   border-radius: 999px;
   font-size: .82rem;
   font-weight: 700;
   letter-spacing: .01em;
-  transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+  transition: background .15s ease, border-color .15s ease;
   white-space: nowrap;
 }
-.lang-toggle svg{ color: var(--gold-light); flex-shrink: 0; }
+.lang-toggle svg{ color: var(--primary); flex-shrink: 0; }
 .lang-toggle:hover{
-  background: linear-gradient(135deg, rgba(233,206,109,.22), rgba(233,206,109,.1));
-  border-color: var(--gold-light);
-  transform: translateY(-1px);
-  box-shadow: 0 5px 14px rgba(0,0,0,.25);
+  background: var(--primary-light);
+  border-color: var(--primary);
 }
 
 .nav-toggle{
@@ -254,18 +201,18 @@ html[lang="ml"] .brand-text h1{ font-size: 1.3rem; }
   justify-content: center;
   align-items: flex-end;
   gap:5px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(233,206,109,.35);
-  border-radius: 10px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
   padding: 9px 10px;
-  transition: background .18s ease, border-color .18s ease;
+  transition: background .15s ease, border-color .15s ease;
 }
 .nav-toggle:hover{
-  background: rgba(233,206,109,.16);
-  border-color: rgba(233,206,109,.6);
+  background: var(--primary-light);
+  border-color: var(--primary);
 }
 .nav-toggle span{
-  height: 2px; background: var(--gold-light); display:block; border-radius: 2px;
+  height: 2px; background: var(--ink); display:block; border-radius: 2px;
 }
 .nav-toggle span:nth-child(1){ width: 22px; }
 .nav-toggle span:nth-child(2){ width: 15px; }
@@ -273,10 +220,10 @@ html[lang="ml"] .brand-text h1{ font-size: 1.3rem; }
 
 .site-nav{
   display:none;
-  padding: 14px 0 2px;
+  padding: 12px 0 2px;
   flex-direction: column;
-  gap: 6px;
-  border-top: 1px solid rgba(233,206,109,.22);
+  gap: 4px;
+  border-top: 1px solid var(--border);
   margin-top: 12px;
 }
 .site-nav.open{ display:flex; animation: fadeIn .2s ease; }
@@ -284,38 +231,35 @@ html[lang="ml"] .brand-text h1{ font-size: 1.3rem; }
 .nav-link{
   background: none;
   border: 1px solid transparent;
-  color: var(--white);
-  opacity: .85;
+  color: var(--ink-soft);
   padding: 9px 14px;
-  border-radius: 999px;
-  font-size: .9rem;
+  border-radius: 8px;
+  font-size: .92rem;
   font-weight: 600;
   letter-spacing: .01em;
+  text-align: left;
   transition: all .15s ease;
 }
 .nav-link:hover{
-  opacity: 1;
-  border-color: rgba(233,206,109,.4);
-  background: rgba(233,206,109,.08);
+  color: var(--ink);
+  background: var(--primary-light);
 }
 .nav-link.active{
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  color: var(--forest-dark);
-  opacity: 1;
-  box-shadow: 0 3px 10px rgba(184,134,11,.35);
+  background: var(--primary);
+  color: var(--white);
 }
 
 /* =========================================================
    MAIN / TABS
    ========================================================= */
 main{
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 36px 20px 60px;
+  padding: 32px 20px 60px;
   width: 100%;
 }
 
-.tab-panel{ display: none; animation: fadeIn .25s ease; }
+.tab-panel{ display: none; animation: fadeIn .2s ease; }
 .tab-panel.active{ display: block; }
 
 @keyframes fadeIn{
@@ -323,64 +267,46 @@ main{
   to{ opacity:1; transform: translateY(0); }
 }
 
-.hero{ max-width: 680px; margin-bottom: 28px; }
+.hero{ max-width: 700px; margin-bottom: 28px; }
 .hero-small{ margin-bottom: 26px; }
 
 .eyebrow{
   display: inline-block;
   text-transform: uppercase;
-  letter-spacing: .1em;
+  letter-spacing: .08em;
   font-size: .74rem;
   font-weight: 700;
-  color: var(--gold-deep);
-  background: var(--forest-light);
+  color: var(--primary);
+  background: var(--primary-light);
   padding: 4px 12px;
   border-radius: 999px;
   margin: 0 0 12px;
 }
 
 .hero h2{
-  font-size: 2.1rem;
+  font-size: 2rem;
   position: relative;
-  padding-bottom: 14px;
+  padding-bottom: 0;
 }
-.hero h2::after{
-  content: "";
-  position: absolute;
-  left: 0; bottom: 0;
-  width: 56px;
-  height: 4px;
-  border-radius: 999px;
-  background: var(--metal-gold);
-}
+.hero h2::after{ content: none; }
 .hero-sub{ color: var(--ink-soft); margin-top: 8px; }
 
-/* ---------------------------------------------------------
-   Malayalam taglines — short, standalone brand/section lines
-   set in Noto Sans Malayalam regardless of the active site
-   language, styled as a quiet gold accent beneath the heading.
-   --------------------------------------------------------- */
 .hero-tagline-ml{
   font-family: var(--font-body-ml);
   font-weight: 600;
-  font-size: 1.02rem;
-  color: var(--gold-deep);
+  font-size: 1rem;
+  color: var(--primary);
   margin: 2px 0 0;
   letter-spacing: .01em;
 }
 
 .link-btn{
   background:none; border:none; text-decoration: underline;
-  color: var(--forest); font-weight:600; padding:0; font-size: inherit;
+  color: var(--primary); font-weight:600; padding:0; font-size: inherit;
 }
 
 /* =========================================================
-   LIVE RAIN / WEATHER ALERT BANNER — home page only, hidden
-   unless an active alert for the configured district exists.
-   Colour-coded to match the familiar red/orange/yellow IMD
-   alert levels; the small dot pulses to signal it's live and
-   auto-refreshing (same polling cycle as the rest of the
-   site's Sheet-driven content).
+   LIVE RAIN / WEATHER ALERT BANNER
    ========================================================= */
 .weather-alert-banner{
   display:flex;
@@ -432,24 +358,24 @@ main{
 }
 
 .weather-alert-banner.level-red{
-  background: linear-gradient(135deg, #FDEBEA, #FBD8D6);
-  border-color: rgba(178,32,32,.35);
+  background: var(--danger-light);
+  border-color: rgba(179,38,30,.3);
   color: #7A1616;
 }
 .weather-alert-banner.level-red .weather-alert-dot{ background: #D62828; }
 .weather-alert-banner.level-red .weather-alert-dot::after{ background: rgba(214,40,40,.35); }
 
 .weather-alert-banner.level-orange{
-  background: linear-gradient(135deg, #FFF1DE, #FFE3C0);
-  border-color: rgba(200,120,10,.35);
+  background: var(--warning-light);
+  border-color: rgba(196,120,15,.3);
   color: #7A4A08;
 }
 .weather-alert-banner.level-orange .weather-alert-dot{ background: #E08A1C; }
 .weather-alert-banner.level-orange .weather-alert-dot::after{ background: rgba(224,138,28,.35); }
 
 .weather-alert-banner.level-yellow{
-  background: linear-gradient(135deg, #FFFAE0, #FFF3B8);
-  border-color: rgba(180,150,10,.35);
+  background: var(--caution-light);
+  border-color: rgba(163,131,0,.3);
   color: #5C4A05;
 }
 .weather-alert-banner.level-yellow .weather-alert-dot{ background: #D4B106; }
@@ -470,21 +396,18 @@ main{
 }
 
 /* =========================================================
-   HOME CAROUSEL — auto-rotating highlights, Bootstrap-style
-   markup/behavior rebuilt in plain CSS/JS (no framework dep).
-   Full-bleed on mobile via negative margins that cancel out
-   main's side padding; contained/rounded on desktop.
+   HOME CAROUSEL
    ========================================================= */
 .carousel{
   position: relative;
   width: 100%;
   aspect-ratio: 16/7;
   min-height: 200px;
-  max-height: 460px;
-  border-radius: var(--radius);
+  max-height: 440px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background: linear-gradient(135deg, var(--forest-light), #D8E9DE);
-  box-shadow: var(--shadow), 0 0 0 1px rgba(184,134,11,.18);
+  background: var(--primary-light);
+  box-shadow: var(--shadow);
   margin: 0 0 30px;
 }
 
@@ -512,7 +435,7 @@ main{
 .carousel-slide .carousel-caption{
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to top, rgba(10,51,35,.85), transparent);
+  background: linear-gradient(to top, rgba(12,37,73,.82), transparent);
   color: var(--white);
   font-weight: 700;
   font-size: .95rem;
@@ -526,16 +449,16 @@ main{
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(233,206,109,.5);
-  background: rgba(10,51,35,.5);
+  border: 1px solid rgba(255,255,255,.4);
+  background: rgba(12,37,73,.55);
   color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .15s ease, transform .15s ease;
+  transition: background .15s ease;
   z-index: 2;
 }
-.carousel-arrow:hover{ background: rgba(10,51,35,.8); transform: translateY(-50%) scale(1.06); }
+.carousel-arrow:hover{ background: rgba(12,37,73,.8); }
 .carousel-arrow-prev{ left: 12px; }
 .carousel-arrow-next{ right: 12px; }
 
@@ -549,27 +472,20 @@ main{
   z-index: 2;
 }
 .carousel-dot{
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,.8);
   background: rgba(255,255,255,.35);
   padding: 0;
   cursor: pointer;
-  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+  transition: background .15s ease, transform .15s ease;
 }
-.carousel-dot.active{ background: var(--gold-light); border-color: var(--gold-light); transform: scale(1.15); }
+.carousel-dot.active{ background: var(--white); transform: scale(1.15); }
 
 /* =========================================================
-   NEWS SECTION — "Latest from your Panchayath"
-   All cards share one fixed-height template so every box in
-   the grid is identical in size, no matter how long the
-   title/summary text is (clamped with ellipsis). The grid
-   flows naturally with the rest of the page — it is no longer
-   placed inside its own inner scroll panel; the whole page
-   scrolls together instead.
+   NEWS SECTION
    ========================================================= */
-
 .latest-scroll{
   padding: 4px 0 0;
   margin: 0;
@@ -578,35 +494,32 @@ main{
 .news-grid{
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 22px;
+  gap: 20px;
   min-width: 0;
   align-items: stretch;
 }
 
 .news-card{
-  background: var(--white);
+  background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(15,76,51,.08);
+  border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  height: 360px;          /* fixed height -> every card is identical */
-  min-width: 0;            /* the key line — grid items default to min-width:auto,
-                              which lets long titles force the track (and page) wider.
-                              min-width:0 lets the card shrink to its grid track and
-                              wrap its text instead. */
-  transition: transform .18s ease, box-shadow .18s ease;
+  height: 360px;
+  min-width: 0;
+  transition: box-shadow .18s ease, border-color .18s ease;
 }
-.news-card:hover{ transform: translateY(-4px); box-shadow: var(--shadow); }
+.news-card:hover{ box-shadow: var(--shadow); border-color: var(--primary); }
 
 .news-card-img{
   width: 100%;
-  height: 150px;            /* fixed image band, same on every card */
+  height: 150px;
   flex: 0 0 150px;
-  background: linear-gradient(135deg, var(--forest-light), #D8E9DE);
+  background: var(--primary-light);
   display:flex; align-items:center; justify-content:center;
-  color: var(--gold);
+  color: var(--primary);
   overflow: hidden;
 }
 .news-card-img img{ width:100%; height:100%; object-fit: cover; display:block; }
@@ -623,24 +536,23 @@ main{
   font-size: .76rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing:.04em;
 }
 .pill{
-  background: var(--forest-light);
-  color: var(--forest-dark);
+  background: var(--primary-light);
+  color: var(--primary-dark);
   padding: 2px 9px;
   border-radius: 999px;
   font-weight: 700;
   white-space: nowrap;
 }
-.pill.pill-fresh{ background: linear-gradient(135deg, var(--forest), var(--forest-dark)); color: var(--white); }
+.pill.pill-fresh{ background: var(--accent); color: var(--white); }
 
 .news-card h3{
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 1.04rem;
+  font-size: 1.02rem;
   line-height: 1.3;
   color: var(--ink);
   margin: 2px 0 0;
   overflow-wrap: break-word;
-  /* clamp to 2 lines so title height never varies between cards */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -653,7 +565,6 @@ main{
   margin:0;
   flex:1;
   overflow-wrap: break-word;
-  /* clamp so description height never varies between cards */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -662,17 +573,13 @@ main{
 
 .news-card-footer{
   font-size: .78rem;
-  color: var(--gold-deep);
-  font-weight: 700;
+  color: var(--ink-soft);
+  font-weight: 600;
   margin-top: auto;
   padding-top: 4px;
-  border-top: 1px dashed rgba(15,76,51,.14);
+  border-top: 1px solid var(--border);
 }
 
-/* ---------------------------------------------------------
-   Compact list row layout — used for Old News archive.
-   Stacked vertically so the thumbnail sits above the text.
-   --------------------------------------------------------- */
 .news-list{
   display: flex;
   flex-direction: column;
@@ -684,24 +591,24 @@ main{
   flex-direction: column;
   align-items: stretch;
   gap: 12px;
-  background: var(--white);
-  border: 1px solid rgba(15,76,51,.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   padding: 12px;
   min-width: 0;
-  transition: transform .18s ease, box-shadow .18s ease;
+  transition: box-shadow .18s ease, border-color .18s ease;
 }
-.news-list-item:hover{ transform: translateY(-3px); box-shadow: var(--shadow); }
+.news-list-item:hover{ box-shadow: var(--shadow); border-color: var(--primary); }
 .news-list-thumb{
   flex: 0 0 auto;
   width: 100%;
   height: 180px;
   border-radius: 8px;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--forest-light), #D8E9DE);
+  background: var(--primary-light);
   display:flex; align-items:center; justify-content:center;
-  color: var(--gold);
+  color: var(--primary);
 }
 .news-list-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
 .news-list-body{
@@ -735,18 +642,21 @@ main{
 }
 
 .section-subhead{
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   font-weight: 700;
   font-family: var(--font-body);
-  color: var(--forest-dark);
+  color: var(--ink);
   margin: 30px 0 14px;
 }
 .section-subhead:first-child{ margin-top: 0; }
 
 .empty-state{
   color: var(--ink-soft);
-  font-style: italic;
-  padding: 30px 0;
+  padding: 28px 24px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
 }
 
 /* =========================================================
@@ -762,32 +672,30 @@ main{
   display: flex;
   gap: 14px;
   align-items: flex-start;
-  background: var(--white);
-  border: 1px solid rgba(15,76,51,.08);
-  border-left: 4px solid var(--forest);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   padding: 16px 18px;
   min-width: 0;
-  transition: transform .15s ease, box-shadow .15s ease;
 }
-.update-item:hover{ transform: translateY(-2px); box-shadow: var(--shadow); }
-.update-item.priority-urgent{ border-left-color: var(--temple); }
+.update-item.priority-urgent{ border-left-color: var(--danger); }
 
 .update-icon{
   flex: 0 0 auto;
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--forest-light), #D8E9DE);
-  color: var(--forest);
+  background: var(--primary-light);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .update-item.priority-urgent .update-icon{
-  background: linear-gradient(135deg, var(--temple-light), #F0CBB8);
-  color: var(--temple);
+  background: var(--danger-light);
+  color: var(--danger);
 }
 
 .update-body{ min-width: 0; flex: 1; }
@@ -807,12 +715,12 @@ main{
   letter-spacing: .05em;
   padding: 2px 9px;
   border-radius: 999px;
-  background: var(--forest-light);
-  color: var(--forest-dark);
+  background: var(--primary-light);
+  color: var(--primary-dark);
   white-space: nowrap;
 }
 .update-item.priority-urgent .update-tag{
-  background: var(--temple);
+  background: var(--danger);
   color: var(--white);
 }
 
@@ -843,13 +751,14 @@ main{
 .achievements-grid{
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  gap: 18px;
   min-width: 0;
 }
 
 .achievement-card{
-  background: var(--white);
-  border: 1px solid rgba(15,76,51,.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   padding: 22px 20px;
@@ -859,15 +768,6 @@ main{
   min-width: 0;
   position: relative;
   overflow: hidden;
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.achievement-card:hover{ transform: translateY(-4px); box-shadow: var(--shadow); }
-.achievement-card::before{
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: var(--metal-gold);
 }
 
 .achievement-top{
@@ -882,8 +782,8 @@ main{
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--forest-light), #D8E9DE);
-  color: var(--forest);
+  background: var(--primary-light);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -893,8 +793,8 @@ main{
   font-size: .78rem;
   font-weight: 700;
   letter-spacing: .04em;
-  color: var(--gold-deep);
-  background: #FBF0D2;
+  color: var(--accent-dark);
+  background: var(--accent-light);
   padding: 3px 10px;
   border-radius: 999px;
   white-space: nowrap;
@@ -932,17 +832,15 @@ main{
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   position: relative;
-  background: linear-gradient(135deg, var(--forest-light), #D8E9DE);
+  background: var(--primary-light);
   min-width: 0;
-  border: 1px solid rgba(15,76,51,.08);
-  transition: box-shadow .2s ease;
+  border: 1px solid var(--border);
 }
-.gallery-item:hover{ box-shadow: var(--shadow); }
-.gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .35s ease; }
-.gallery-item:hover img{ transform: scale(1.06); }
+.gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .3s ease; }
+.gallery-item:hover img{ transform: scale(1.04); }
 .gallery-item .cap{
   position:absolute; left:0; right:0; bottom:0;
-  background: linear-gradient(to top, rgba(10,51,35,.88), transparent);
+  background: linear-gradient(to top, rgba(12,37,73,.85), transparent);
   color: var(--white);
   font-size: .82rem;
   padding: 18px 10px 8px;
@@ -953,10 +851,10 @@ main{
    FORMS / CARDS
    ========================================================= */
 .panel-card{
-  background: var(--white);
+  background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(15,76,51,.08);
+  border: 1px solid var(--border);
   padding: 26px;
   min-width: 0;
 }
@@ -972,7 +870,7 @@ main{
   font-family: inherit;
   font-size: .95rem;
   padding: 10px 12px;
-  border: 1px solid #D8DED9;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--paper);
   color: var(--ink);
@@ -983,23 +881,23 @@ main{
 }
 .form-card input:focus, .form-card textarea:focus{
   outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(184,134,11,.18);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
   background: var(--white);
 }
 
 .btn-primary, .btn-secondary{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  border:none; border-radius: 999px;
+  border:none; border-radius: 8px;
   padding: 12px 22px;
   font-weight: 700;
   font-size: .95rem;
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  transition: transform .12s ease, box-shadow .15s ease, background .15s ease;
 }
-.btn-primary{ background: #25D366; color: #06340F; box-shadow: 0 4px 14px rgba(37,211,102,.35); }
-.btn-primary:hover{ background: #1fbd59; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(37,211,102,.42); }
-.btn-secondary{ background: linear-gradient(135deg, var(--forest), var(--forest-dark)); color: var(--white); box-shadow: 0 4px 14px rgba(10,51,35,.3); }
-.btn-secondary:hover{ transform: translateY(-2px); box-shadow: 0 6px 18px rgba(10,51,35,.38); }
+.btn-primary{ background: #25D366; color: #06340F; }
+.btn-primary:hover{ background: #1fbd59; }
+.btn-secondary{ background: var(--primary); color: var(--white); }
+.btn-secondary:hover{ background: var(--primary-dark); }
 
 .form-note{ font-size: .78rem; color: var(--ink-soft); margin:0; }
 
@@ -1013,19 +911,19 @@ main{
 
 .contact-info ul{ list-style: none; margin: 0; padding:0; display:flex; flex-direction:column; gap:16px; }
 .contact-info li{ display:flex; align-items:flex-start; gap:12px; color: var(--ink-soft); font-size: .95rem; min-width: 0; }
-.contact-info li svg{ color: var(--gold); flex-shrink:0; margin-top:2px; }
+.contact-info li svg{ color: var(--primary); flex-shrink:0; margin-top:2px; }
 .contact-info li span{ min-width: 0; overflow-wrap: break-word; }
 
 /* =========================================================
    FOOTER
    ========================================================= */
 .site-footer{
-  background: linear-gradient(160deg, #0d3f2a 0%, var(--forest-dark) 55%, #082a1c 100%);
+  background: var(--primary-darker);
   color: var(--white);
   margin-top: 40px;
 }
 .footer-inner{
-  max-width: 1100px; margin:0 auto; padding: 22px 20px;
+  max-width: 1120px; margin:0 auto; padding: 22px 20px;
   display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between;
   font-size: .85rem; color: rgba(255,255,255,.75);
 }
@@ -1034,11 +932,11 @@ main{
   font-family: var(--font-body-ml);
   font-weight: 600;
   font-size: .84rem;
-  color: var(--gold-light);
+  color: rgba(255,255,255,.65);
   margin: 0;
 }
 .footer-links{ display:flex; gap:18px; flex-wrap:wrap; }
-.footer-links .link-btn{ color: var(--gold-light); text-decoration:none; font-size:.85rem; font-weight: 600; transition: opacity .15s ease; opacity: .9; }
+.footer-links .link-btn{ color: rgba(255,255,255,.85); text-decoration:none; font-size:.85rem; font-weight: 600; transition: opacity .15s ease; opacity: .9; }
 .footer-links .link-btn:hover{ text-decoration: underline; opacity: 1; }
 
 /* =========================================================
@@ -1054,7 +952,7 @@ main{
   }
   .site-nav.open{ display:flex; }
   .nav-link{ text-align:left; }
-  .hero h2{ font-size: 1.6rem; }
+  .hero h2{ font-size: 1.55rem; }
 
   .carousel{
     aspect-ratio: 4/3;
@@ -1076,9 +974,9 @@ main{
   .header-top{ gap: 8px; }
   .brand{ gap: 7px; }
   .brand-emblem{ width: 32px; height: 32px; }
-  .brand-text h1{ font-size: .88rem; letter-spacing: .01em; }
+  .brand-text h1{ font-size: .88rem; letter-spacing: 0; }
   html[lang="en"] .brand-text h1,
-  html[lang="ml"] .brand-text h1{ font-size: .78rem; }
+  html[lang="ml"] .brand-text h1{ font-size: .8rem; }
   .site-nav{ padding: 0 0 10px; }
   .nav-link{ padding: 8px 12px; font-size: .88rem; }
 
@@ -1086,8 +984,8 @@ main{
   .lang-toggle{ padding: 5px 7px; font-size: .62rem; gap: 3px; }
   .lang-toggle svg{ width: 12px; height: 12px; }
 
-  main{ padding: 26px 16px 44px; }
-  .hero h2{ font-size: 1.4rem; }
+  main{ padding: 24px 16px 44px; }
+  .hero h2{ font-size: 1.35rem; }
   .hero-sub{ font-size: .92rem; }
   .eyebrow{ font-size: .72rem; }
   .hero-tagline-ml{ font-size: .92rem; }
@@ -1120,13 +1018,13 @@ main{
 }
 
 @media (min-width: 1024px){
-  main{ padding-top: 44px; }
+  main{ padding-top: 40px; }
 }
 
 @media (max-width: 360px){
-  .brand-text h1{ font-size: .78rem; }
+  .brand-text h1{ font-size: .8rem; }
   html[lang="en"] .brand-text h1,
-  html[lang="ml"] .brand-text h1{ font-size: .68rem; }
+  html[lang="ml"] .brand-text h1{ font-size: .7rem; }
   .lang-toggle{ padding: 5px; }
   .lang-toggle #langToggleLabel{ display: none; }
 }
@@ -1134,35 +1032,26 @@ main{
 @media (prefers-reduced-motion: reduce){
   html{ scroll-behavior: auto; }
   .tab-panel{ animation: none; }
-  .news-card{ transition: none; }
 }
 
 /* =========================================================
-   BLOG-STYLE EXPAND/COLLAPSE — supports script.js's
-   toggleNewsExpand(): clicking a news title (or its
-   read-more/close button) toggles the ".is-open" state so
-   the full summary shows inline instead of navigating away.
-   Without these rules the JS state changes but nothing is
-   visible, because the card height is fixed and the summary
-   text is line-clamped elsewhere in this file.
+   BLOG-STYLE EXPAND/COLLAPSE (Old News list)
    ========================================================= */
 .news-card-title{ cursor: pointer; }
-.news-card-title:hover{ color: var(--forest); }
+.news-card-title:hover{ color: var(--primary); }
 
 .news-readmore{
   background: none;
   border: none;
   padding: 0;
   align-self: flex-start;
-  color: var(--forest);
+  color: var(--primary);
   font-weight: 700;
   font-size: .82rem;
   text-decoration: underline;
 }
-.news-readmore:hover{ color: var(--forest-dark); }
+.news-readmore:hover{ color: var(--primary-dark); }
 
-/* Lifts the 2-line clamp (and the old-news nowrap+ellipsis)
-   so the full summary text can display once a card is open. */
 .news-card-summary-full{
   display: block !important;
   -webkit-line-clamp: unset !important;
@@ -1171,8 +1060,6 @@ main{
   text-overflow: unset !important;
 }
 
-/* Let an open "Latest" card grow past the fixed 360px height
-   to fit its full summary, instead of clipping it. */
 .news-card.is-open{
   height: auto !important;
 }
@@ -1180,13 +1067,6 @@ main{
   overflow: visible;
 }
 
-/* Desktop-only: once a "Latest" card is open the card grows tall
-   under a fixed 150px image band, which reads as cramped in the
-   wide grid. Give the image a little more height and the body a
-   touch more breathing room on wider screens so an open card looks
-   like a deliberate expanded article — image on top, text below —
-   rather than a stretched version of the closed card. Mobile is
-   untouched (this block only applies at 761px and above). */
 @media (min-width: 761px){
   .news-card.is-open .news-card-img{
     height: 200px;
@@ -1201,32 +1081,32 @@ main{
   }
 }
 
-/* Visible keyboard focus */
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
 /* =========================================================
    HELP DESK — quick-dial contact cards for the home page.
-   Mirrors the printed "Help Desk" poster (colour-coded role
-   icons + tap-to-call numbers) using the site's existing
-   forest/gold card language instead of an embedded image.
+   Sourced from the "HelpDesk" Sheet tab (see script.js) so the
+   office can correct a wrong number or add/remove a ward member
+   themselves, the same way they edit News or Updates.
    ========================================================= */
 .helpdesk-section{
   margin: 44px 0 8px;
   padding-top: 32px;
-  border-top: 1px dashed rgba(15,76,51,.16);
+  border-top: 1px solid var(--border);
 }
+.helpdesk-section[hidden]{ display: none; }
 
 .helpdesk-heading{ max-width: 680px; margin-bottom: 20px; }
-.helpdesk-heading h2{ font-size: 1.8rem; padding-bottom: 12px; }
+.helpdesk-heading h2{ font-size: 1.7rem; padding-bottom: 0; }
 
 .helpdesk-subhead{
-  font-size: 1rem;
+  font-size: .96rem;
   font-weight: 700;
   font-family: var(--font-body);
-  color: var(--forest-dark);
+  color: var(--ink);
   text-transform: uppercase;
   letter-spacing: .04em;
   margin: 26px 0 12px;
@@ -1234,11 +1114,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   align-items: center;
   gap: 10px;
 }
+.helpdesk-subhead[hidden]{ display: none; }
 .helpdesk-subhead::after{
   content: "";
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, rgba(184,134,11,.35), transparent);
+  background: var(--border);
 }
 
 .helpdesk-grid{
@@ -1252,58 +1133,67 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--white);
-  border: 1px solid rgba(15,76,51,.08);
-  border-left: 4px solid var(--forest);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
   padding: 12px 14px;
   min-width: 0;
   text-decoration: none;
   color: var(--ink);
-  transition: transform .16s ease, box-shadow .16s ease;
+  transition: box-shadow .15s ease, border-color .15s ease;
 }
-.helpdesk-item:hover{ transform: translateY(-3px); box-shadow: var(--shadow); }
-.helpdesk-item:active{ transform: translateY(-1px); }
+.helpdesk-item:hover{ box-shadow: var(--shadow); }
 
 .helpdesk-icon{
   flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--white);
-  box-shadow: inset 0 -2px 4px rgba(0,0,0,.12);
+  background: var(--primary);
 }
 
-/* Colour variants — echo the printed poster's colour-coding
-   for each role/ward, applied to both the border and icon. */
-.helpdesk-green{ border-left-color: #2c8a3a; }
-.helpdesk-green .helpdesk-icon{ background: linear-gradient(135deg, #4dbb5e, #2c8a3a); }
-
-.helpdesk-orange{ border-left-color: #e08a1c; }
-.helpdesk-orange .helpdesk-icon{ background: linear-gradient(135deg, #f7b855, #e08a1c); }
-
+/* Colour variants — kept as a small rotating set so cards read
+   distinctly at a glance without needing per-row styling from
+   the Sheet. */
 .helpdesk-blue{ border-left-color: #2f6fb5; }
-.helpdesk-blue .helpdesk-icon{ background: linear-gradient(135deg, #5c9fe0, #2f6fb5); }
+.helpdesk-blue .helpdesk-icon{ background: #2f6fb5; }
+
+.helpdesk-teal{ border-left-color: #0E7C7B; }
+.helpdesk-teal .helpdesk-icon{ background: #0E7C7B; }
 
 .helpdesk-purple{ border-left-color: #6a3e9e; }
-.helpdesk-purple .helpdesk-icon{ background: linear-gradient(135deg, #9b6fd1, #6a3e9e); }
+.helpdesk-purple .helpdesk-icon{ background: #6a3e9e; }
 
-.helpdesk-brown{ border-left-color: #5f4029; }
-.helpdesk-brown .helpdesk-icon{ background: linear-gradient(135deg, #92694a, #5f4029); }
+.helpdesk-brown{ border-left-color: #6b4a2e; }
+.helpdesk-brown .helpdesk-icon{ background: #6b4a2e; }
 
-.helpdesk-pink{ border-left-color: #c23a6d; }
-.helpdesk-pink .helpdesk-icon{ background: linear-gradient(135deg, #e874a3, #c23a6d); }
+.helpdesk-pink{ border-left-color: #b23d6b; }
+.helpdesk-pink .helpdesk-icon{ background: #b23d6b; }
+
+.helpdesk-green{ border-left-color: #2c8a5a; }
+.helpdesk-green .helpdesk-icon{ background: #2c8a5a; }
 
 .helpdesk-name{
   flex: 1;
   min-width: 0;
+  overflow-wrap: break-word;
+}
+.helpdesk-name strong{
+  display: block;
   font-weight: 700;
   font-size: .92rem;
-  overflow-wrap: break-word;
+}
+.helpdesk-name span{
+  display: block;
+  font-size: .78rem;
+  color: var(--ink-soft);
+  font-weight: 500;
 }
 
 .helpdesk-phone{
@@ -1313,91 +1203,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   gap: 6px;
   font-weight: 700;
   font-size: .86rem;
-  color: var(--forest);
+  color: var(--primary-dark);
   white-space: nowrap;
-  background: var(--forest-light);
+  background: var(--primary-light);
   padding: 5px 10px;
   border-radius: 999px;
 }
-.helpdesk-phone svg{ color: var(--gold-deep); flex-shrink: 0; }
+.helpdesk-phone svg{ color: var(--primary); flex-shrink: 0; }
 
 @media (max-width: 480px){
   .helpdesk-section{ margin-top: 36px; padding-top: 26px; }
-  .helpdesk-heading h2{ font-size: 1.35rem; }
+  .helpdesk-heading h2{ font-size: 1.3rem; }
   .helpdesk-grid{ grid-template-columns: 1fr; }
   .helpdesk-item{ padding: 11px 12px; }
   .helpdesk-icon{ width: 38px; height: 38px; }
   .helpdesk-phone{ font-size: .8rem; padding: 4px 8px; }
-}
-
-/* =========================================================
-   EMERGENCY CONTACTS — district (DEOC), taluk (TEOC), and
-   forest division control room numbers for the home page.
-   Reuses the Help Desk card language (.helpdesk-grid /
-   .helpdesk-item / .helpdesk-icon / .helpdesk-name /
-   .helpdesk-phone) for the TEOC and Forest rows, and adds a
-   single high-visibility red banner on top for the district
-   DEOC number/toll-free/mobile — mirroring the printed
-   control-room poster this section is based on.
-   ========================================================= */
-.emergency-section{
-  margin: 44px 0 8px;
-  padding-top: 32px;
-  border-top: 1px dashed rgba(15,76,51,.16);
-}
-
-.emergency-deoc{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: linear-gradient(135deg, #FDEBEA, #FBD8D6);
-  border: 1px solid rgba(178,32,32,.35);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 18px 20px;
-  margin: 0 0 22px;
-  color: #7A1616;
-}
-
-.emergency-deoc-title{
-  font-size: .8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  margin: 0;
-}
-
-.emergency-deoc-numbers{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.emergency-deoc-numbers a{
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: rgba(255,255,255,.55);
-  border: 1px solid rgba(178,32,32,.3);
-  padding: 7px 14px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: .92rem;
-  color: #7A1616;
-  text-decoration: none;
-  transition: background .15s ease, transform .15s ease;
-}
-.emergency-deoc-numbers a:hover{
-  background: rgba(255,255,255,.85);
-  transform: translateY(-2px);
-}
-.emergency-deoc-numbers a svg{ color: #B2201F; flex-shrink: 0; }
-
-/* Forest Division row reuses .helpdesk-green for its icon/border,
-   defined above; no extra rule needed there. */
-
-@media (max-width: 480px){
-  .emergency-section{ margin-top: 36px; padding-top: 26px; }
-  .emergency-deoc{ padding: 14px; }
-  .emergency-deoc-numbers a{ font-size: .84rem; padding: 6px 11px; }
 }
