@@ -144,6 +144,7 @@ const I18N = {
     "nav.achievements": "Achievements",
     "nav.oldnews": "Old News",
     "nav.gallery": "Gallery",
+    "nav.helpdesk": "Help Desk",
     "nav.complaint": "File a Complaint",
     "nav.contact": "Contact",
 
@@ -271,6 +272,9 @@ const I18N = {
     "helpdesk.title": "Help Desk",
     "helpdesk.sub": "Reach out directly to Panchayath officials and ward members — tap a card to call.",
     "helpdesk.wardHeading": "Ward Members",
+    "helpdesk.ctaTitle": "View Contact Numbers",
+    "helpdesk.ctaSub": "President, Secretary, and all Ward Members",
+    "helpdesk.empty": "No contacts listed yet — check back soon.",
 
     "weatherAlert.level.red": "Red Alert",
     "weatherAlert.level.orange": "Orange Alert",
@@ -284,6 +288,7 @@ const I18N = {
     "nav.achievements": "നേട്ടങ്ങൾ",
     "nav.oldnews": "പഴയ വാർത്തകൾ",
     "nav.gallery": "ഗാലറി",
+    "nav.helpdesk": "ഹെൽപ്പ് ഡെസ്ക്",
     "nav.complaint": "പരാതി നൽകുക",
     "nav.contact": "ബന്ധപ്പെടുക",
 
@@ -353,6 +358,9 @@ const I18N = {
     "helpdesk.title": "ഹെൽപ്പ് ഡെസ്ക്",
     "helpdesk.sub": "പഞ്ചായത്ത് ഉദ്യോഗസ്ഥരുമായും വാർഡ് അംഗങ്ങളുമായും നേരിട്ട് ബന്ധപ്പെടുക — വിളിക്കാൻ കാർഡിൽ ടാപ്പ് ചെയ്യുക.",
     "helpdesk.wardHeading": "വാർഡ് അംഗങ്ങൾ",
+    "helpdesk.ctaTitle": "ഫോൺ നമ്പറുകൾ കാണുക",
+    "helpdesk.ctaSub": "പ്രസിഡന്റ്, സെക്രട്ടറി, എല്ലാ വാർഡ് അംഗങ്ങളും",
+    "helpdesk.empty": "ഇതുവരെ വിവരങ്ങളൊന്നും ചേർത്തിട്ടില്ല — ഉടൻ വീണ്ടും പരിശോധിക്കുക.",
 
     "home.reportIssue": "ഒരു പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക",
 
@@ -1156,10 +1164,10 @@ function helpDeskItemHTML(contact){
 }
 
 function renderHelpDesk(){
-  const section = document.getElementById("helpDeskSection");
   const grid = document.getElementById("helpDeskGrid");
   const wardHeading = document.getElementById("helpDeskWardHeading");
   const wardGrid = document.getElementById("helpDeskWardGrid");
+  const emptyState = document.getElementById("helpDeskEmptyState");
 
   const officials = helpDeskCache.filter(c => !c.isWard);
   const wardMembers = helpDeskCache.filter(c => c.isWard);
@@ -1168,10 +1176,12 @@ function renderHelpDesk(){
   if (wardGrid) wardGrid.innerHTML = wardMembers.map(helpDeskItemHTML).join("");
   if (wardHeading) wardHeading.hidden = wardMembers.length === 0;
 
-  // The whole section stays hidden until the office has added at
-  // least one row to the HelpDesk Sheet tab, rather than showing
-  // an empty "Help Desk" heading with no cards under it.
-  if (section) section.hidden = helpDeskCache.length === 0;
+  // The Help Desk page now lives on its own tab (see tab-helpdesk in
+  // index.html), reached via a button on the home page, so it behaves
+  // like every other Sheet-driven page: show an empty-state message
+  // rather than hiding itself, since a nav click should always land
+  // somewhere explicable.
+  if (emptyState) emptyState.hidden = helpDeskCache.length > 0;
 }
 
 /* =========================================================

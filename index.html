@@ -95,6 +95,7 @@
       <button class="nav-link" data-tab="achievements" data-i18n="nav.achievements">Achievements</button>
       <button class="nav-link" data-tab="oldnews" data-i18n="nav.oldnews">Old News</button>
       <button class="nav-link" data-tab="gallery" data-i18n="nav.gallery">Gallery</button>
+      <button class="nav-link" data-tab="helpdesk" data-i18n="nav.helpdesk">Help Desk</button>
       <button class="nav-link" data-tab="complaint" data-i18n="nav.complaint">File a Complaint</button>
       <button class="nav-link" data-tab="contact" data-i18n="nav.contact">Contact</button>
     </nav>
@@ -183,16 +184,27 @@
       <p class="about-source" data-i18n="about.source">Source: Census of India 2011 &middot; Kerala Local Self Government Department (LSGD). Pincode 689650.</p>
     </div>
 
-    <!-- ===== HELP DESK — quick-dial contacts for officials & ward members ===== -->
-    <div class="helpdesk-section" id="helpDeskSection">
+    <!-- ===== HELP DESK — compact link to the dedicated Help Desk
+         page (id="tab-helpdesk" below), instead of showing all the
+         contact cards inline on the home page. ===== -->
+    <div class="about-section">
       <div class="helpdesk-heading">
         <p class="eyebrow" data-i18n="helpdesk.eyebrow">Quick Contacts</p>
         <h2 data-i18n="helpdesk.title">Help Desk</h2>
         <p class="hero-sub" data-i18n="helpdesk.sub">Reach out directly to Panchayath officials and ward members — tap a card to call.</p>
       </div>
-      <div class="helpdesk-grid" id="helpDeskGrid"></div>
-      <p class="helpdesk-subhead" id="helpDeskWardHeading" data-i18n="helpdesk.wardHeading" hidden>Ward Members</p>
-      <div class="helpdesk-grid helpdesk-grid-ward" id="helpDeskWardGrid"></div>
+      <button type="button" class="helpdesk-cta" data-tab="helpdesk">
+        <span class="helpdesk-cta-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.6a16 16 0 0 0 6 6l1.1-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
+        </span>
+        <span class="helpdesk-cta-text">
+          <strong data-i18n="helpdesk.ctaTitle">View Contact Numbers</strong>
+          <span data-i18n="helpdesk.ctaSub">President, Secretary, and all Ward Members</span>
+        </span>
+        <span class="helpdesk-cta-arrow" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+        </span>
+      </button>
     </div>
 
     <button type="button" class="btn-secondary report-issue-btn" data-tab="complaint" data-i18n="home.reportIssue">Report an Issue</button>
@@ -371,6 +383,22 @@
     <div class="gallery-grid" id="galleryGrid"></div>
   </section>
 
+  <!-- ===== HELP DESK — dedicated page for officials & ward member
+       contacts, sourced from the "HelpDesk" Sheet tab (see script.js).
+       Linked from the Help Desk button on the home page and from the
+       main nav. ===== -->
+  <section class="tab-panel" id="tab-helpdesk">
+    <div class="hero hero-small">
+      <p class="eyebrow" data-i18n="helpdesk.eyebrow">Quick Contacts</p>
+      <h2 data-i18n="helpdesk.title">Help Desk</h2>
+      <p class="hero-sub" data-i18n="helpdesk.sub">Reach out directly to Panchayath officials and ward members — tap a card to call.</p>
+    </div>
+    <div class="helpdesk-grid" id="helpDeskGrid"></div>
+    <p class="helpdesk-subhead" id="helpDeskWardHeading" data-i18n="helpdesk.wardHeading" hidden>Ward Members</p>
+    <div class="helpdesk-grid helpdesk-grid-ward" id="helpDeskWardGrid"></div>
+    <p class="empty-state" id="helpDeskEmptyState" hidden data-i18n="helpdesk.empty">No contacts listed yet &mdash; check back soon.</p>
+  </section>
+
   <!-- ===== COMPLAINT BOX ===== -->
   <section class="tab-panel" id="tab-complaint">
     <div class="hero hero-small">
@@ -469,6 +497,7 @@
       <button class="link-btn" data-tab="updates" data-i18n="nav.updates">Important Updates</button>
       <button class="link-btn" data-tab="achievements" data-i18n="nav.achievements">Achievements</button>
       <button class="link-btn" data-tab="gallery" data-i18n="nav.gallery">Gallery</button>
+      <button class="link-btn" data-tab="helpdesk" data-i18n="nav.helpdesk">Help Desk</button>
       <button class="link-btn" data-tab="complaint" data-i18n="nav.complaint">File a Complaint</button>
       <button class="link-btn" data-tab="contact" data-i18n="nav.contact">Contact</button>
     </div>
