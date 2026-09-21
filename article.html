@@ -3,51 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Latest News & Articles | Cherukol Connect</title>
+<title>Latest News & Articles | Cherukole Connect</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Rozha+One&family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="logo.png">
 <style>
   :root{
-    --white:#FFFFFF; --paper:#FBFBF9; --ink:#1C2620; --ink-soft:#4E5A52;
-    --forest:#0F4C33; --forest-dark:#0A3323; --forest-light:#E7F1EB;
-    --gold:#B8860B; --gold-light:#E9CE6D; --gold-deep:#8A6A16;
-    --metal-gold: linear-gradient(120deg, var(--gold-deep) 0%, var(--gold) 22%, var(--gold-light) 45%, #FFF3C4 52%, var(--gold-light) 60%, var(--gold) 80%, var(--gold-deep) 100%);
-    --temple:#A6421E;
-    --font-display:'Rozha One', serif;
-    --font-brand:'Cinzel', 'Rozha One', serif;
-    --font-body:'Mukta', sans-serif;
-    --font-body-ml:'Noto Sans Malayalam', 'Mukta', sans-serif;
+    --white:#FFFFFF; --paper:#F6F8FB; --ink:#1A2333; --ink-soft:#5B6478; --border:#E3E8F0;
+    --primary:#1B4C96; --primary-dark:#123568; --primary-darker:#0C2549; --primary-light:#EAF1FC;
+    --accent:#C4780F; --accent-light:#FCEFD9;
+    --font-display:'Inter', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-body-ml:'Noto Sans Malayalam', 'Inter', sans-serif;
   }
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
   html[lang="ml"] body{ font-family: var(--font-body-ml); }
   body{
-    margin:0; background:
-      radial-gradient(900px 420px at 100% 0%, rgba(15,76,51,.05), transparent 60%),
-      radial-gradient(700px 380px at 0% 15%, rgba(184,134,11,.05), transparent 55%),
-      var(--paper);
+    margin:0; background: var(--paper);
     color:var(--ink); font-family:var(--font-body); line-height:1.7;
   }
   .kasavu-border{
-    height:10px; width:100%;
-    background:
-      repeating-linear-gradient(45deg, rgba(10,51,35,.55) 0 2px, transparent 2px 9px),
-      repeating-linear-gradient(-45deg, rgba(10,51,35,.55) 0 2px, transparent 2px 9px),
-      var(--metal-gold);
-    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.55), inset 0 -1.5px 0 rgba(0,0,0,.25), 0 2px 8px rgba(0,0,0,.18);
+    height:4px; width:100%;
+    background: var(--primary);
   }
 
   /* ---- Masthead ---- */
   .masthead{
-    background:
-      radial-gradient(480px 160px at 10% -10%, rgba(233,206,109,.14), transparent 60%),
-      radial-gradient(600px 200px at 100% 0%, rgba(15,76,51,.5), transparent 65%),
-      linear-gradient(155deg, #0f4a30 0%, var(--forest-dark) 48%, #071f15 100%);
-    color:var(--white);
-    border-bottom:1px solid rgba(233,206,109,.35);
-    box-shadow:0 8px 24px rgba(3,20,13,.32);
+    background: var(--white);
+    color:var(--ink);
+    border-bottom:1px solid var(--border);
   }
   .masthead-inner{
     max-width:760px; margin:0 auto; padding:16px 20px;
@@ -55,15 +41,15 @@
   }
   .masthead-brand{
     display:inline-flex; align-items:center; gap:8px;
-    color:var(--gold-light); text-decoration:none;
-    font-family:var(--font-brand); font-weight:700; font-size:1.05rem; letter-spacing:.03em;
+    color:var(--primary); text-decoration:none;
+    font-family:var(--font-display); font-weight:800; font-size:1.05rem; letter-spacing:-.01em;
   }
   .masthead-brand svg{ flex-shrink:0; }
-  .masthead-brand span{ color:var(--white); }
+  .masthead-brand span{ color:var(--ink); }
   .masthead-live{
     display:inline-flex; align-items:center; gap:6px;
     font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
-    color:var(--gold-light); border:1px solid rgba(233,206,109,.4);
+    color:var(--primary); border:1px solid var(--border);
     padding:5px 11px; border-radius:999px; white-space:nowrap;
   }
   .masthead-live::before{
@@ -79,7 +65,7 @@
     font-size:.78rem; color:var(--ink-soft); font-weight:600;
     padding:16px 0 0;
   }
-  .breadcrumb a{ color:var(--forest); text-decoration:none; }
+  .breadcrumb a{ color:var(--primary); text-decoration:none; }
   .breadcrumb a:hover{ text-decoration:underline; }
   .breadcrumb .sep{ opacity:.5; }
 
@@ -89,18 +75,17 @@
   .badge-pill{
     display:inline-block; font-size:.72rem; font-weight:800; text-transform:uppercase;
     letter-spacing:.06em; padding:4px 12px; border-radius:999px;
-    background:linear-gradient(135deg, var(--forest), var(--forest-dark)); color:var(--white);
-    box-shadow:0 3px 10px rgba(15,76,51,.3);
+    background: var(--primary); color:var(--white);
   }
   .article-head h1{
-    font-family:var(--font-display); font-weight:400; color:var(--forest-dark);
-    font-size:2.15rem; line-height:1.22; margin:0 0 16px;
+    font-family:var(--font-display); font-weight:800; color:var(--ink);
+    font-size:2rem; line-height:1.25; margin:0 0 16px; letter-spacing:-.01em;
   }
-  html[lang="ml"] .article-head h1{ font-family:var(--font-body-ml); font-weight:800; font-size:1.7rem; }
+  html[lang="ml"] .article-head h1{ font-family:var(--font-body-ml); font-weight:800; font-size:1.6rem; }
 
   .byline{
     display:flex; align-items:center; flex-wrap:wrap; gap:10px 16px;
-    padding:14px 0; border-top:1px solid rgba(15,76,51,.12); border-bottom:1px solid rgba(15,76,51,.12);
+    padding:14px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
     font-size:.86rem; color:var(--ink-soft);
   }
   .byline-source{
@@ -108,19 +93,20 @@
   }
   .byline-avatar{
     width:32px; height:32px; border-radius:50%; flex-shrink:0;
-    background:linear-gradient(135deg, var(--gold-light), var(--gold));
-    display:flex; align-items:center; justify-content:center; color:var(--forest-dark);
-    box-shadow:0 0 0 2px var(--white), 0 0 0 3px rgba(15,76,51,.15);
+    background: var(--primary-light);
+    display:flex; align-items:center; justify-content:center; color:var(--primary);
+    box-shadow:0 0 0 1px var(--border);
   }
   .byline-meta{ display:flex; gap:14px; flex-wrap:wrap; margin-left:auto; }
   .byline-meta span{ display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
-  .byline-meta svg{ color:var(--gold-deep); flex-shrink:0; }
+  .byline-meta svg{ color:var(--primary); flex-shrink:0; }
 
   /* ---- Hero image ---- */
   .article-hero{
     margin:22px 0 8px; border-radius:14px; overflow:hidden;
-    box-shadow:0 14px 32px rgba(10,51,35,.22), 0 0 0 1px rgba(184,134,11,.18);
-    background:linear-gradient(135deg, var(--forest-light), #D8E9DE);
+    box-shadow: 0 12px 28px rgba(18,32,64,.10);
+    background: var(--primary-light);
+    border:1px solid var(--border);
   }
   .article-hero img{
     width:100%; max-height:420px; object-fit:cover; display:block;
@@ -129,23 +115,15 @@
   /* ---- Body ---- */
   .article-body{ margin-top:26px; }
   .article-lead{
-    font-size:1.18rem; color:var(--ink); font-weight:500;
-  }
-  .article-lead::first-letter{
-    font-family:var(--font-display); font-size:3.6rem; line-height:.78; font-weight:400;
-    float:left; margin:6px 10px 0 0; color:var(--forest);
-  }
-  html[lang="ml"] .article-lead::first-letter{
-    font-family:var(--font-body-ml); font-size:1.18rem; font-weight:500;
-    float:none; margin:0;
+    font-size:1.15rem; color:var(--ink); font-weight:500;
   }
   .article-body p{ white-space:pre-wrap; margin:0 0 1.1em; overflow-wrap:break-word; }
 
   .article-divider{
-    display:flex; align-items:center; gap:12px; margin:34px 0; color:var(--gold-deep);
+    display:flex; align-items:center; gap:12px; margin:34px 0; color:var(--accent);
   }
   .article-divider::before, .article-divider::after{
-    content:""; flex:1; height:1px; background:linear-gradient(to right, transparent, rgba(184,134,11,.4), transparent);
+    content:""; flex:1; height:1px; background: var(--border);
   }
   .article-divider svg{ flex-shrink:0; }
 
@@ -156,41 +134,41 @@
   }
   .btn-back{
     display:inline-flex; align-items:center; gap:8px;
-    background:linear-gradient(135deg, var(--forest), var(--forest-dark)); color:var(--white);
+    background: var(--primary); color:var(--white);
     text-decoration:none; font-weight:700; font-size:.9rem;
-    padding:11px 20px; border-radius:999px; box-shadow:0 4px 14px rgba(10,51,35,.3);
-    transition:transform .15s ease, box-shadow .15s ease;
+    padding:11px 20px; border-radius:8px;
+    transition: background .15s ease;
   }
-  .btn-back:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(10,51,35,.38); }
+  .btn-back:hover{ background: var(--primary-dark); }
   .share-row{ display:flex; align-items:center; gap:8px; }
   .share-row .label{ font-size:.78rem; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin-right:2px; }
   .share-btn{
-    width:38px; height:38px; border-radius:50%; border:1px solid rgba(15,76,51,.15);
-    background:var(--white); color:var(--forest); display:flex; align-items:center; justify-content:center;
-    box-shadow:0 2px 8px rgba(10,51,35,.1); transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--border);
+    background:var(--white); color:var(--primary); display:flex; align-items:center; justify-content:center;
+    transition: background .15s ease;
     text-decoration:none; cursor:pointer;
   }
-  .share-btn:hover{ transform:translateY(-2px); background:var(--forest-light); box-shadow:0 5px 14px rgba(10,51,35,.18); }
+  .share-btn:hover{ background: var(--primary-light); }
 
   footer{
-    background:linear-gradient(160deg, #0d3f2a 0%, var(--forest-dark) 55%, #082a1c 100%);
+    background: var(--primary-darker);
     color:rgba(255,255,255,.78); text-align:center; padding:20px; font-size:.82rem; margin-top:48px;
   }
-  footer .tagline{ color:var(--gold-light); font-weight:600; margin:4px 0 0; font-size:.8rem; }
+  footer .tagline{ color:rgba(255,255,255,.65); font-weight:600; margin:4px 0 0; font-size:.8rem; }
 
   /* ---- Loading / not-found states ---- */
   .state-screen{
     max-width:760px; margin:60px auto; padding:0 20px; text-align:center; color:var(--ink-soft);
   }
   .state-screen h2{
-    font-family:var(--font-display); color:var(--forest-dark); font-weight:400; margin:0 0 10px;
+    font-family:var(--font-display); color:var(--ink); font-weight:800; margin:0 0 10px;
   }
   html[lang="ml"] .state-screen h2{ font-family:var(--font-body-ml); font-weight:800; }
   .state-screen .btn-back{ margin-top:18px; }
   [hidden]{ display:none !important; }
 
   @media (max-width:560px){
-    .article-head h1{ font-size:1.55rem; }
+    .article-head h1{ font-size:1.5rem; }
     .article-hero img{ max-height:260px; }
     .byline-meta{ margin-left:0; }
     .article-lead{ font-size:1.05rem; }
@@ -203,7 +181,7 @@
     <div class="masthead-inner">
       <a class="masthead-brand" href="index.html">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        <span id="backLabel">Cherukol Connect</span>
+        <span id="backLabel">Cherukole Connect</span>
       </a>
       <span class="masthead-live" id="liveLabel">Live</span>
     </div>
@@ -222,14 +200,14 @@
       <p id="notFoundSub">This story may have moved to the archive or been removed.</p>
       <a class="btn-back" href="index.html" id="notFoundBackLink">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        <span id="notFoundBackText">Back to Cherukol Connect</span>
+        <span id="notFoundBackText">Back to Cherukole Connect</span>
       </a>
     </div>
 
     <!-- Article content -->
     <div id="articleContent" hidden>
       <nav class="breadcrumb">
-        <a href="index.html" id="crumbHome">Cherukol Connect</a>
+        <a href="index.html" id="crumbHome">Cherukole Connect</a>
         <span class="sep">/</span>
         <span id="crumbBadge">Latest</span>
       </nav>
@@ -242,7 +220,7 @@
             <span class="byline-avatar">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
             </span>
-            <span id="sourceLabel">Cherukol Grama Panchayath</span>
+            <span id="sourceLabel">Cherukole Grama Panchayath</span>
           </div>
           <div class="byline-meta">
             <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span id="articleDate"></span></span>
@@ -266,7 +244,7 @@
       <div class="article-actions">
         <a class="btn-back" href="index.html" id="bottomBackLink">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-          <span id="bottomBackText">Back to Cherukol Connect</span>
+          <span id="bottomBackText">Back to Cherukole Connect</span>
         </a>
         <div class="share-row">
           <span class="label" id="shareLabel">Share</span>
@@ -282,7 +260,7 @@
   </main>
 
   <footer>
-    Cherukol Connect — Panchayath News &amp; Services
+    Cherukole Connect — Panchayath News &amp; Services
     <p class="tagline">നമ്മുടെ പഞ്ചായത്ത്, നമ്മുടെ ശബ്ദം</p>
   </footer>
 
@@ -303,13 +281,13 @@ const ARTICLE_I18N = {
   en: {
     live: "Live",
     latest: "Latest",
-    brand: "Cherukol Connect",
-    source: "Cherukol Grama Panchayath",
+    brand: "Cherukole Connect",
+    source: "Cherukole Grama Panchayath",
     readTime: "1 min read",
     share: "Share",
     copyLabel: "Copy link",
     copiedLabel: "Copied!",
-    backText: "Back to Cherukol Connect",
+    backText: "Back to Cherukole Connect",
     loadingHeading: "Loading…",
     loadingSub: "Fetching the latest article.",
     notFoundHeading: "Article not found",
@@ -447,7 +425,7 @@ function renderArticle(item){
   const summary = (lang === "ml" && item.summaryML) ? item.summaryML : item.summary;
   const dateStr = formatDate(item.date, lang);
 
-  document.title = title + " — Cherukol Connect";
+  document.title = title + " — Cherukole Connect";
   document.getElementById("articleTitle").textContent = title;
   document.getElementById("articleSummary").textContent = summary;
   document.getElementById("articleDate").textContent = dateStr;
