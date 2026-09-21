@@ -220,7 +220,12 @@ const I18N = {
     "about.households": "Households",
     "about.area": "Area",
     "about.literacy": "Literacy Rate",
+    "about.wards": "Wards",
     "about.source": "Source: Census of India 2011 · Kerala Local Self Government Department (LSGD). Pincode 689650.",
+
+    "map.eyebrow": "Find Us",
+    "map.title": "Cherukole Panchayath on the Map",
+    "map.sub": "The Panchayath office is in Cherukole, Ranni Taluk, Pathanamthitta district.",
 
     "helpdesk.eyebrow": "Quick Contacts",
     "helpdesk.title": "Help Desk",
@@ -320,7 +325,12 @@ const I18N = {
     "about.households": "കുടുംബങ്ങൾ",
     "about.area": "വിസ്തീർണ്ണം",
     "about.literacy": "സാക്ഷരതാ നിരക്ക്",
+    "about.wards": "വാർഡുകൾ",
     "about.source": "സ്രോതസ്സ്: സെൻസസ് 2011 · കേരള തദ്ദേശ സ്വയംഭരണ വകുപ്പ് (LSGD). പിൻകോഡ് 689650.",
+
+    "map.eyebrow": "ഞങ്ങളെ കണ്ടെത്തുക",
+    "map.title": "ഭൂപടത്തിൽ ചെറുകോൽ പഞ്ചായത്ത്",
+    "map.sub": "പഞ്ചായത്ത് ഓഫീസ് റാന്നി താലൂക്കിലെ ചെറുകോലിൽ, പത്തനംതിട്ട ജില്ലയിൽ സ്ഥിതി ചെയ്യുന്നു.",
 
     "weatherAlert.level.red": "റെഡ് അലേർട്ട്",
     "weatherAlert.level.orange": "ഓറഞ്ച് അലേർട്ട്",
