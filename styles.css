@@ -1155,11 +1155,53 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   margin: 0;
 }
 
+.about-grid-3{
+  grid-template-columns: repeat(3, 1fr);
+}
+
 @media (max-width: 480px){
   .about-section{ margin-top: 36px; padding-top: 26px; }
   .about-grid{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .about-grid-3{ grid-template-columns: repeat(3, 1fr); }
   .about-stat{ padding: 14px 12px; }
   .about-stat-value{ font-size: 1.3rem; }
+}
+
+@media (max-width: 400px){
+  .about-grid-3{ grid-template-columns: 1fr; }
+}
+
+/* =========================================================
+   FUNCTIONS — "what the Panchayath does" cards on the
+   Achievements page. Plain informational cards: no icon, just
+   a title and one line, reusing the site's card language.
+   ========================================================= */
+.function-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin: 22px 0 16px;
+}
+.function-card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--primary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 18px;
+}
+.function-card h3{
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: .98rem;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.function-card p{
+  margin: 0;
+  font-size: .88rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
 }
 
 /* =========================================================
