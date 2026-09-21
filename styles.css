@@ -1204,6 +1204,24 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   line-height: 1.5;
 }
 
+.function-card-link{
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.function-card-link:hover{
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+.function-card-link-label{
+  display: block;
+  margin-top: 8px;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
 /* =========================================================
    MAP — Panchayath location, home page only.
    ========================================================= */
