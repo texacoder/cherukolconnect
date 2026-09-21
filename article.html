@@ -4,10 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Latest News & Articles | Cherukole Connect</title>
+
+<!-- ===== SEO: core meta tags. No canonical tag here on purpose —
+     each ?id=... is a distinct article, and a single static canonical
+     would tell search engines to treat every article as a duplicate
+     of one URL instead of indexing each story separately. ===== -->
+<meta name="description" content="Read the latest news, notices, and announcements from Cherukole Grama Panchayath, Pathanamthitta, Kerala.">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Cherukole Connect">
+<meta property="og:title" content="Latest News & Articles | Cherukole Connect">
+<meta property="og:description" content="Read the latest news, notices, and announcements from Cherukole Grama Panchayath, Pathanamthitta, Kerala.">
+<meta property="og:image" content="https://cherukoleconnect.in/logo.png">
+<meta property="og:locale" content="en_IN">
+<meta property="og:locale:alternate" content="ml_IN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Latest News & Articles | Cherukole Connect">
+<meta name="twitter:description" content="Read the latest news, notices, and announcements from Cherukole Grama Panchayath, Pathanamthitta, Kerala.">
+<meta name="twitter:image" content="https://cherukoleconnect.in/logo.png">
+<meta name="theme-color" content="#1E7A3D">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>
   :root{
     --white:#FFFFFF; --paper:#F5F8F6; --ink:#1A231D; --ink-soft:#5B6660; --border:#DEE7E1;
@@ -419,6 +440,16 @@ function showNotFound(){
   document.getElementById("articleContent").hidden = true;
 }
 
+// Updates a <meta name="..."> or <meta property="..."> tag's content
+// in place, so platforms that execute JS when generating a share
+// preview (unlike WhatsApp/Facebook's crawlers, which read the static
+// HTML only) see the real article's title/description/image instead
+// of the generic fallback baked into the page.
+function setMeta(selector, content){
+  const el = document.querySelector(selector);
+  if (el) el.setAttribute("content", content);
+}
+
 function renderArticle(item){
   const lang = document.documentElement.getAttribute("lang") === "ml" ? "ml" : "en";
   const title = (lang === "ml" && item.titleML) ? item.titleML : item.title;
@@ -430,6 +461,13 @@ function renderArticle(item){
   document.getElementById("articleSummary").textContent = summary;
   document.getElementById("articleDate").textContent = dateStr;
   document.getElementById("articleImage").src = item.image;
+
+  setMeta('meta[name="description"]', summary);
+  setMeta('meta[property="og:title"]', title + " — Cherukole Connect");
+  setMeta('meta[property="og:description"]', summary);
+  if (item.image) setMeta('meta[property="og:image"]', item.image);
+  setMeta('meta[name="twitter:title"]', title + " — Cherukole Connect");
+  setMeta('meta[name="twitter:description"]', summary);
 
   const articleUrl = window.location.href;
 

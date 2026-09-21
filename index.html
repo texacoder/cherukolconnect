@@ -30,6 +30,8 @@
 
 <!-- ===== SEO: favicon (reuses existing logo) ===== -->
 <link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="theme-color" content="#1E7A3D">
 
 <!-- ===== SEO: structured data for local government org ===== -->
 <script type="application/ld+json">
@@ -42,7 +44,9 @@
   "logo": "https://cherukoleconnect.in/logo.png",
   "address": {
     "@type": "PostalAddress",
+    "addressLocality": "Cherukole",
     "addressRegion": "Kerala",
+    "postalCode": "689650",
     "addressCountry": "IN"
   }
 }
@@ -134,7 +138,7 @@
       <p class="eyebrow"><span data-i18n="home.eyebrow">Updated daily</span> &middot; <span id="todayDate"></span></p>
       <h2 data-i18n="home.title">Latest from your Panchayath</h2>
       <p class="hero-tagline-ml">നമ്മുടെ പഞ്ചായത്ത്, നമ്മുടെ ശബ്ദം</p>
-      <p class="hero-sub" data-i18n="home.sub">News and announcements from the last two days. Scroll the list below to see everything at a glance — older stories move to the Old News page and clear out a week after publishing.</p>
+      <p class="hero-sub" data-i18n="home.sub">News and announcements from the last seven days. Scroll the list below to see everything at a glance — older stories move to the Old News page and clear out 30 days after publishing.</p>
     </div>
 
     <!-- Uniform-size news cards in a scrollable panel -->
@@ -218,7 +222,7 @@
     <div class="hero hero-small">
       <p class="eyebrow" data-i18n="updates.eyebrow">Notices &amp; Circulars</p>
       <h2 data-i18n="updates.title">Important Updates</h2>
-      <p class="hero-sub" data-i18n="updates.sub">Deadlines, office notices, and announcements that need your attention. This is placeholder content &mdash; replace it with real notices any time.</p>
+      <p class="hero-sub" data-i18n="updates.sub">Deadlines, office notices, and announcements that need your attention.</p>
     </div>
     <div class="updates-list" id="updatesGrid"></div>
     <p class="empty-state" id="updatesEmptyState" hidden data-i18n="updates.empty">No important updates at the moment.</p>
@@ -229,7 +233,7 @@
     <div class="hero hero-small">
       <p class="eyebrow" data-i18n="achievements.eyebrow">Milestones</p>
       <h2 data-i18n="achievements.title">Achievements</h2>
-      <p class="hero-sub" data-i18n="achievements.sub">Projects completed and recognitions earned by the Panchayath. This is placeholder content &mdash; replace it with real achievements any time.</p>
+      <p class="hero-sub" data-i18n="achievements.sub">Projects completed and recognitions earned by the Panchayath.</p>
     </div>
     <div class="achievements-grid" id="achievementsGrid"></div>
     <p class="empty-state" id="achievementsEmptyState" hidden data-i18n="achievements.empty">No achievements listed yet.</p>
@@ -240,7 +244,7 @@
     <div class="hero hero-small">
       <p class="eyebrow" data-i18n="oldnews.eyebrow">Archive</p>
       <h2 data-i18n="nav.oldnews">Old News</h2>
-      <p class="hero-sub" data-i18n="oldnews.sub">Stories older than two days live here for one week from their publish date, then they're cleared automatically.</p>
+      <p class="hero-sub" data-i18n="oldnews.sub">Stories older than seven days live here for 30 days from their publish date, then they're cleared automatically.</p>
     </div>
     <div class="news-list" id="oldNewsGrid"></div>
     <p class="empty-state" id="oldEmptyState" hidden data-i18n="oldnews.empty">Nothing in the archive at the moment.</p>
@@ -251,7 +255,7 @@
     <div class="hero hero-small">
       <p class="eyebrow" data-i18n="gallery.eyebrow">Around the Panchayath</p>
       <h2 data-i18n="gallery.title">Photo Gallery</h2>
-      <p class="hero-sub" data-i18n="gallery.sub">A look at our offices, events, and public spaces.</p>
+      <p class="hero-sub" data-i18n="gallery.sub">Capturing Cherukole Panchayath's initiatives, emergency response, community events, and public services.</p>
     </div>
     <div class="gallery-grid" id="galleryGrid"></div>
   </section>
@@ -304,7 +308,7 @@
         <ul>
           <li>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-            <span data-i18n="contact.address">Cherukole,Pathanamthitta, Kerala &ndash; 689650</span>
+            <span data-i18n="contact.address">Cherukole, Pathanamthitta, Kerala &ndash; 689650</span>
           </li>
           <li>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.6a16 16 0 0 0 6 6l1.1-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
@@ -354,7 +358,7 @@
       <button class="link-btn" data-tab="updates" data-i18n="nav.updates">Important Updates</button>
       <button class="link-btn" data-tab="achievements" data-i18n="nav.achievements">Achievements</button>
       <button class="link-btn" data-tab="gallery" data-i18n="nav.gallery">Gallery</button>
-      <button class="link-btn" data-tab="complaint" data-i18n="nav.complaint">Complaints</button>
+      <button class="link-btn" data-tab="complaint" data-i18n="nav.complaint">File a Complaint</button>
       <button class="link-btn" data-tab="contact" data-i18n="nav.contact">Contact</button>
     </div>
   </div>
