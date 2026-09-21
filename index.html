@@ -55,6 +55,12 @@
 </head>
 <body>
 
+<!-- ===== OFFICIAL STRIP — identifies this as a government/Panchayath
+     site (state + district), not an emblem/seal (those aren't ours to
+     reproduce) — just a plain text utility bar, a common pattern on
+     Indian government portals. ===== -->
+<div class="gov-strip" data-i18n="gov.strip">Government of Kerala &middot; Pathanamthitta District &middot; Local Self Government</div>
+
 <!-- ===== HEADER ===== -->
 <header class="site-header">
   <div class="header-inner">
@@ -136,6 +142,38 @@
       <div class="news-grid" id="latestNewsGrid"></div>
     </div>
     <p class="empty-state" id="latestEmptyState" hidden><span data-i18n="home.emptyPre">No fresh updates right now &mdash; check back soon, or browse</span> <button class="link-btn" data-tab="oldnews" data-i18n="nav.oldnews">Old News</button>.</p>
+
+    <!-- ===== ABOUT — factual background on the Panchayath itself.
+         Static (edited in this file, not the Sheet) since it changes
+         almost never. Figures are from Census 2011 and Kerala LSGD
+         records; sourced and dated in the small print below so it's
+         clear this isn't live data. ===== -->
+    <div class="about-section">
+      <div class="helpdesk-heading">
+        <p class="eyebrow" data-i18n="about.eyebrow">About</p>
+        <h2 data-i18n="about.title">Cherukole Grama Panchayath</h2>
+        <p class="hero-sub" data-i18n="about.desc">Cherukole is a Grama Panchayath in Ranni Taluk, Pathanamthitta district, Kerala, under Elanthoor Block Panchayath. It falls within the Ranni assembly and Pathanamthitta parliamentary constituencies.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-stat">
+          <span class="about-stat-value">12,169</span>
+          <span class="about-stat-label" data-i18n="about.population">Population</span>
+        </div>
+        <div class="about-stat">
+          <span class="about-stat-value">3,382</span>
+          <span class="about-stat-label" data-i18n="about.households">Households</span>
+        </div>
+        <div class="about-stat">
+          <span class="about-stat-value">1,562 ha</span>
+          <span class="about-stat-label" data-i18n="about.area">Area</span>
+        </div>
+        <div class="about-stat">
+          <span class="about-stat-value">97.02%</span>
+          <span class="about-stat-label" data-i18n="about.literacy">Literacy Rate</span>
+        </div>
+      </div>
+      <p class="about-source" data-i18n="about.source">Source: Census of India 2011 &middot; Kerala Local Self Government Department (LSGD). Pincode 689650.</p>
+    </div>
 
     <!-- ===== HELP DESK — quick-dial contacts for officials & ward members ===== -->
     <div class="helpdesk-section" id="helpDeskSection">

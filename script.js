@@ -211,6 +211,17 @@ const I18N = {
 
     "home.reportIssue": "Report an Issue",
 
+    "gov.strip": "Government of Kerala · Pathanamthitta District · Local Self Government",
+
+    "about.eyebrow": "About",
+    "about.title": "Cherukole Grama Panchayath",
+    "about.desc": "Cherukole is a Grama Panchayath in Ranni Taluk, Pathanamthitta district, Kerala, under Elanthoor Block Panchayath. It falls within the Ranni assembly and Pathanamthitta parliamentary constituencies.",
+    "about.population": "Population",
+    "about.households": "Households",
+    "about.area": "Area",
+    "about.literacy": "Literacy Rate",
+    "about.source": "Source: Census of India 2011 · Kerala Local Self Government Department (LSGD). Pincode 689650.",
+
     "helpdesk.eyebrow": "Quick Contacts",
     "helpdesk.title": "Help Desk",
     "helpdesk.sub": "Reach out directly to Panchayath officials and ward members — tap a card to call.",
@@ -299,6 +310,17 @@ const I18N = {
     "helpdesk.wardHeading": "വാർഡ് അംഗങ്ങൾ",
 
     "home.reportIssue": "ഒരു പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക",
+
+    "gov.strip": "കേരള സർക്കാർ · പത്തനംതിട്ട ജില്ല · തദ്ദേശ സ്വയംഭരണ വകുപ്പ്",
+
+    "about.eyebrow": "പരിചയം",
+    "about.title": "ചെറുകോൽ ഗ്രാമപഞ്ചായത്ത്",
+    "about.desc": "പത്തനംതിട്ട ജില്ലയിലെ റാന്നി താലൂക്കിൽ, ഇലന്തൂർ ബ്ലോക്ക് പഞ്ചായത്തിന് കീഴിലുള്ള ഒരു ഗ്രാമപഞ്ചായത്താണ് ചെറുകോൽ. റാന്നി നിയമസഭാ മണ്ഡലത്തിലും പത്തനംതിട്ട ലോക്സഭാ മണ്ഡലത്തിലും ഇത് ഉൾപ്പെടുന്നു.",
+    "about.population": "ജനസംഖ്യ",
+    "about.households": "കുടുംബങ്ങൾ",
+    "about.area": "വിസ്തീർണ്ണം",
+    "about.literacy": "സാക്ഷരതാ നിരക്ക്",
+    "about.source": "സ്രോതസ്സ്: സെൻസസ് 2011 · കേരള തദ്ദേശ സ്വയംഭരണ വകുപ്പ് (LSGD). പിൻകോഡ് 689650.",
 
     "weatherAlert.level.red": "റെഡ് അലേർട്ട്",
     "weatherAlert.level.orange": "ഓറഞ്ച് അലേർട്ട്",
