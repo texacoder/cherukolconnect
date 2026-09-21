@@ -163,7 +163,7 @@ const I18N = {
     "achievements.empty": "No achievements listed yet.",
 
     "oldnews.eyebrow": "Archive",
-    "oldnews.sub": "Stories older than seven days live here for 30days from their publish date, then they're cleared automatically.",
+    "oldnews.sub": "Stories older than seven days live here for 30 days from their publish date, then they're cleared automatically.",
     "oldnews.empty": "Nothing in the archive at the moment.",
 
     "gallery.eyebrow": "Around the Panchayath",
