@@ -142,6 +142,8 @@ button{ font-family: inherit; cursor:pointer; }
   align-items:center;
   gap: 12px;
   min-width: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .brand-emblem{
