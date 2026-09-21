@@ -1,20 +1,22 @@
 /* =========================================================
    TOKENS
-   Modern, minimal civic/government palette: deep institutional
-   blue, warm amber for emphasis/alerts, neutral cool grays.
+   Modern, minimal civic/government palette, tied to the actual
+   logo mark: a clean mid-dark green as primary, warm amber for
+   emphasis/alerts, neutral (faintly green-tinted) grays. Deliberately
+   flat — no gradients, no gold, no ornamental texture.
    ========================================================= */
 :root{
   --white:      #FFFFFF;
-  --paper:      #F6F8FB;   /* page background */
+  --paper:      #F5F8F6;   /* page background */
   --surface:    #FFFFFF;   /* card/panel background */
-  --ink:        #1A2333;
-  --ink-soft:   #5B6478;
-  --border:     #E3E8F0;
+  --ink:        #1A231D;
+  --ink-soft:   #5B6660;
+  --border:     #DEE7E1;
 
-  --primary:       #1B4C96;  /* institutional blue */
-  --primary-dark:  #123568;
-  --primary-darker:#0C2549;
-  --primary-light: #EAF1FC;  /* pale blue tint for surfaces */
+  --primary:       #1E7A3D;  /* logo green */
+  --primary-dark:  #145C2C;
+  --primary-darker:#0D3F1E;
+  --primary-light: #E7F5EA;  /* pale green tint for surfaces */
 
   --accent:       #C4780F;  /* amber — CTAs, highlights, "fresh" tags */
   --accent-light: #FCEFD9;

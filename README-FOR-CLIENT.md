@@ -3,14 +3,27 @@
 Six things on the website — News, Important Updates, Achievements, the
 weather alert banner, the home page photo slider, and the Help Desk
 contact cards — are all controlled from **one Google Sheet**. Nobody
-needs to touch code or log into anything to change them: edit a row in
-the Sheet, and the live site picks it up automatically within 5 minutes.
+needs to touch code or log into anything to change them.
+
+There are two different actions, and they work differently:
+
+- **Adding something new** (a news item, a notice, a new HelpDesk
+  number) → whoever's posting fills out a short **Google Form** — like
+  a survey: type into a few labelled fields, hit Submit, done. No
+  spreadsheet, no column headers to get right.
+- **Deleting or correcting something already posted** (a typo, an
+  outdated phone number, taking down an old notice) → open the
+  **Sheet** itself and delete or edit that one row directly. A Form
+  can only add new rows, it can't change or remove an existing one —
+  but deleting a row is a genuinely simple, occasional 2-click action
+  (see **Deleting or correcting an entry** below), nowhere near as
+  fiddly as composing a whole row from scratch used to be.
 
 This only needs to be set up once.
 
 ## One-time setup
 
-1. Create a new Google Sheet.
+1. Create a new Google Sheet (or keep using your existing one).
 2. Rename the six tabs at the bottom (or create them) to exactly:
    `News`, `Updates`, `Achievements`, `WeatherAlert`, `HomeSlider`, `HelpDesk`
 3. In the first row of each tab, type the column headers exactly as
@@ -23,10 +36,43 @@ This only needs to be set up once.
 6. Send the six links to whoever maintains the website — they get
    pasted into the `SHEET_CSV` block near the top of `script.js`,
    replacing the placeholder for that tab. That's the only code change
-   ever needed; after this, the office only edits the Sheet.
+   ever needed; after this, the office only uses Forms/the Sheet.
 
 Leaving a tab's link as the placeholder just means that section stays
 empty/hidden on the site — nothing breaks.
+
+## Setting up an "Add" Form for a tab (do this once per tab)
+
+1. In the Sheet, click the tab you want a Form for (e.g. `News`).
+2. **Insert → Form** (in the menu bar). Google creates a linked Form
+   and opens it for editing.
+3. Delete the one default question it adds, then add one question per
+   column for that tab, in the same order as the header row (see the
+   column list below — skip `id`, see note underneath). Use "Short
+   answer" for most fields, "Paragraph" for the long text ones
+   (summary/detail), and a "Multiple choice" question for anything
+   with fixed options, like Updates' `priority` (`urgent` / `notice`).
+4. Click **Send**, then the link icon to get a shareable link. Bookmark
+   that link (or save it in WhatsApp/Notes) — that's what you'll open
+   whenever you want to add something to that tab.
+5. **About `id`**: leave it off the Form. Each row just needs *some*
+   unique value in that column so the site can tell rows apart — if
+   you leave it blank, the site auto-generates one, so it's fine to
+   skip. Only fill it in yourself if you want a memorable shareable
+   article link for a News story.
+
+Repeat for each tab you want a Form for. Five minutes each once you've
+done the first one.
+
+## Deleting or correcting an entry
+
+1. Open the Sheet (not the Form) and click the tab the entry is in.
+2. Find the row — Form submissions land at the bottom, newest last.
+3. **To delete it**: right-click the row number on the left → **Delete
+   row**. **To fix a typo or a wrong number**: just click the cell and
+   retype it.
+4. That's it — the live site picks up the change automatically within
+   5 minutes, same as any other Sheet edit.
 
 ## Column headers, tab by tab
 

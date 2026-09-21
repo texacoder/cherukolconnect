@@ -118,24 +118,13 @@ const DAY_MS = 24 * 60 * 60 * 1000;
    that now comes entirely from the HomeSlider Sheet tab above.
    ========================================================= */
 const GALLERY_IMAGES = [
-  { src: "rain.jpg",  caption: "" },
-  { src: "electricity.jpg",    caption: "" },
-  { src: "rain1.jpg",  caption: "" },
-  { src: "rain2.jpg",  caption: "" },
-  { src: "rain3.jpg",  caption: "" },
-  { src: "rain4.jpg",  caption: "" },
-  { src: "rain5.jpg",  caption: "" },
   { src: "p1.jpg",  caption: "" },
   { src: "p2.jpg",  caption: "" },
   { src: "p3.jpg",  caption: "" },
   { src: "p4.jpg",  caption: "" }
 ];
 
-const GALLERY_CAPTIONS_ML = {
-  "rain.jpg": "",
-  "electricity.jpg": "",
-  "cherukolrain.jpg": ""
-};
+const GALLERY_CAPTIONS_ML = {};
 
 /* =========================================================
    HELP DESK — quick-dial contact cards shown on the home
@@ -807,28 +796,23 @@ const CAROUSEL_INTERVAL_MS = 4500;
 let carouselIndex = 0;
 let carouselTimer = null;
 
-// Shown when the "HomeSlider" Sheet tab has no rows yet (or isn't
-// reachable) so the hero never renders as an empty box — a single
-// local image with a generic caption, in each language.
-const HOME_CAROUSEL_FALLBACK = [
-  {
-    id: "fallback-1",
-    image: "img.jpg",
-    caption: "Cherukole Grama Panchayath",
-    _ml: { caption: "ചെറുകോൽ ഗ്രാമപഞ്ചായത്ത്" }
-  }
-];
-
 function getCarouselSlides(){
-  return (homeSliderCache.length ? homeSliderCache : HOME_CAROUSEL_FALLBACK).map(localize);
+  return homeSliderCache.map(localize);
 }
 
 function renderCarousel(){
+  const carousel = document.getElementById("homeCarousel");
   const track = document.getElementById("carouselTrack");
   const dotsWrap = document.getElementById("carouselDots");
   if (!track || !dotsWrap) return;
 
   const slides = getCarouselSlides();
+
+  // No local fallback image — the carousel is entirely Sheet-driven,
+  // so it just stays hidden until the "HomeSlider" tab has at least
+  // one row, instead of showing an empty or broken-looking box.
+  if (carousel) carousel.hidden = slides.length === 0;
+  if (slides.length === 0) return;
 
   track.innerHTML = slides.map(item => {
     const caption = item.caption || "";
