@@ -94,6 +94,23 @@ button{ font-family: inherit; cursor:pointer; }
 }
 
 /* =========================================================
+   GOV STRIP — plain text utility bar identifying this as a
+   government/Panchayath site (state + district), the way most
+   Indian government portals lead with one. Deliberately just
+   text on a flat dark surface — no emblem/seal, since those
+   aren't ours to reproduce.
+   ========================================================= */
+.gov-strip{
+  background: var(--primary-darker);
+  color: rgba(255,255,255,.88);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-align: center;
+  padding: 6px 16px;
+}
+
+/* =========================================================
    HEADER — clean white bar, sticky, minimal chrome.
    ========================================================= */
 .site-header{
@@ -1086,6 +1103,63 @@ main{
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* =========================================================
+   ABOUT — factual background on the Panchayath (Census/LSGD
+   figures). Static content, always present, so the home page
+   never reads as empty even before any Sheet data exists.
+   ========================================================= */
+.about-section{
+  margin: 44px 0 8px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.about-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin: 22px 0 16px;
+}
+
+.about-stat{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--primary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.about-stat-value{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+
+.about-stat-label{
+  font-size: .82rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.about-source{
+  font-size: .78rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+@media (max-width: 480px){
+  .about-section{ margin-top: 36px; padding-top: 26px; }
+  .about-grid{ grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .about-stat{ padding: 14px 12px; }
+  .about-stat-value{ font-size: 1.3rem; }
 }
 
 /* =========================================================
